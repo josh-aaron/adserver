@@ -110,3 +110,36 @@ func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 
 	return nil
 }
+
+func (s *CampaignRepo) Update(ctx context.Context, campaignId int64) error {
+	log.Println("campaign.Update()")
+	return nil
+
+}
+
+func (s *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign, error) {
+	log.Println("campaign.GetById()")
+	query := `SELECT * FROM campaign WHERE id = $1`
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	var campaign Campaign
+	err := s.db.QueryRowContext(ctx, query, campaignId).Scan(
+		&campaign.Id,
+		&campaign.Name,
+		&campaign.StartDate,
+		&campaign.EndDate,
+		&campaign.TargetDmaId,
+		&campaign.AdId,
+		&campaign.AdName,
+		&campaign.AdDuration,
+		&campaign.AdCreativeId,
+		&campaign.AdCreativeUrl,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &campaign, nil
+}

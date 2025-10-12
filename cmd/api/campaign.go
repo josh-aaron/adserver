@@ -32,6 +32,33 @@ func (app *application) getCampaignsHandler(w http.ResponseWriter, r *http.Reque
 
 }
 
+func (app *application) getCampaignById(w http.ResponseWriter, r *http.Request) {
+	log.Println("getCampaignsHandler()")
+	campaignIdParam := r.PathValue("id")
+	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	ctx := r.Context()
+	campaign, err := app.repository.Campaign.GetById(ctx, campaignIdInt)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	js, err := json.Marshal(campaign)
+
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(js)
+}
+
 func (app *application) deleteCampaignHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("deleteCampaignHandler()")
 
@@ -93,4 +120,8 @@ func (app *application) createCampaignHandler(w http.ResponseWriter, r *http.Req
 	}
 	w.WriteHeader(http.StatusCreated)
 	w.Write(js)
+}
+
+func (app *application) updateCampaignHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("createCampaignHandler()")
 }
