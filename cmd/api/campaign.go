@@ -9,6 +9,29 @@ import (
 	"github.com/josh-aaron/adserver/internal/model"
 )
 
+// TODO: Think about implementing helper methods to reduce repetitive code (e.g., header setting, error handling)
+func (app *application) getCampaignsHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("getCampaignsHandler()")
+	ctx := r.Context()
+	campaigns, err := app.repository.Campaign.GetAll(ctx)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	js, err := json.Marshal(campaigns)
+
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(js)
+
+}
+
 func (app *application) deleteCampaignHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("deleteCampaignHandler()")
 

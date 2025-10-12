@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"log"
+	"time"
 )
 
 type Campaign struct {
@@ -24,9 +25,45 @@ type CampaignRepo struct {
 	db *sql.DB
 }
 
+func (s *CampaignRepo) GetAll(ctx context.Context) ([]Campaign, error) {
+	log.Println("campaign.GetAll()")
+	query := `SELECT * FROM campaign`
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+	rows, err := s.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var campaigns []Campaign
+	for rows.Next() {
+		var c Campaign
+		err := rows.Scan(
+			&c.Id,
+			&c.Name,
+			&c.StartDate,
+			&c.EndDate,
+			&c.TargetDmaId,
+			&c.AdId,
+			&c.AdName,
+			&c.AdDuration,
+			&c.AdCreativeId,
+			&c.AdCreativeUrl,
+		)
+		if err != nil {
+			return nil, err
+		}
+		campaigns = append(campaigns, c)
+	}
+
+	return campaigns, nil
+}
+
 func (s *CampaignRepo) Delete(ctx context.Context, campaignId int64) error {
 	log.Println("campaign.Delete()")
 	query := `DELETE FROM campaign WHERE id = $1`
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
 	result, err := s.db.ExecContext(ctx, query, campaignId)
 	if err != nil {
 		return err
@@ -48,6 +85,10 @@ func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 	INSERT INTO campaign (name, start_date, end_date, target_dma_id, ad_id, ad_name, ad_duration, ad_creative_id, ad_creative_url)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id
 	`
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
 	err := s.db.QueryRowContext(
 		ctx,
 		query,
