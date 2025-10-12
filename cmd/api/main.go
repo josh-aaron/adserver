@@ -1,11 +1,15 @@
 package main
 
-import "log"
+import (
+	"log"
+
+	"github.com/josh-aaron/adserver/internal/env"
+)
 
 func main() {
 
 	conf := config{
-		addr: ":8080",
+		addr: env.GetString("ADDR", ":8080"),
 	}
 
 	app := &application{
