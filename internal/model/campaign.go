@@ -3,6 +3,7 @@ package model
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log"
 )
 
@@ -21,6 +22,24 @@ type Campaign struct {
 
 type CampaignRepo struct {
 	db *sql.DB
+}
+
+func (s *CampaignRepo) Delete(ctx context.Context, campaignId int64) error {
+	log.Println("campaign.Delete()")
+	query := `DELETE FROM campaign WHERE id = $1`
+	result, err := s.db.ExecContext(ctx, query, campaignId)
+	if err != nil {
+		return err
+	}
+	rows, err := result.RowsAffected()
+	if err != nil {
+		return nil
+	}
+	if rows == 0 {
+		return errors.New("campaign not found")
+	}
+	log.Printf("campaign.Delete: successfully delete campaign with id %d", campaignId)
+	return nil
 }
 
 func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {

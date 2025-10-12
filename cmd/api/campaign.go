@@ -4,9 +4,33 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/josh-aaron/adserver/internal/model"
 )
+
+func (app *application) deleteCampaignHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("deleteCampaignHandler()")
+
+	campaignIdParam := r.PathValue("id")
+	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	ctx := r.Context()
+
+	err = app.repository.Campaign.Delete(ctx, campaignIdInt)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
 
 func (app *application) createCampaignHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("createCampaignHandler()")

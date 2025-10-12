@@ -8,6 +8,7 @@ import (
 type Repository struct {
 	Campaign interface {
 		Create(context.Context, *Campaign) error
+		Delete(context.Context, int64) error
 	}
 }
 
