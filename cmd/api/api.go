@@ -28,6 +28,7 @@ type dbConfig struct {
 func (app *application) mount() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", app.healthCheckHandler)
+	mux.HandleFunc("POST /campaign", app.createCampaignHandler)
 
 	return mux
 }
