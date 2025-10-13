@@ -12,9 +12,10 @@ type Repository struct {
 		Update(context.Context, int64, *Campaign) error
 		GetAll(context.Context) ([]Campaign, error)
 		GetById(context.Context, int64) (*Campaign, error)
+		GetByDma(context.Context, int64) (*Campaign, error)
 	}
 	VastResponse interface {
-		GetByDma(context.Context, int64) (*VAST, error)
+		GetVast(context.Context, *Campaign) (*VAST, error)
 	}
 }
 

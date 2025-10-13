@@ -186,47 +186,10 @@ type VastResponseRepo struct {
 	db *sql.DB
 }
 
-type CampaignPayloadForVast struct {
-	Id            int64  `json:"id"`
-	AdId          int    `json:"adId"`
-	AdName        string `json:"adName"`
-	AdDuration    int    `json:"adDuration"`
-	AdCreativeId  int    `json:"adCreativeId"`
-	AdCreativeUrl string `json:"adCreativeUrl"`
-}
-
-func (s *VastResponseRepo) GetByDma(ctx context.Context, dmaId int64) (*VAST, error) {
+func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign) (*VAST, error) {
 	log.Println("vastResponse.GetByDma()")
 
-	// Find campaign by dmaID
-	query := `
-	SELECT id, start_date, end_date, ad_id, ad_name, ad_duration, ad_creative_id, ad_creative_url 
-	FROM campaign 
-	WHERE target_dma_id = $1
-	`
-	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
-	defer cancel()
-
-	var startDate string
-	var endDate string
-
-	var campaignPayloadForVast CampaignPayloadForVast
-	err := s.db.QueryRowContext(ctx, query, dmaId).Scan(
-		&campaignPayloadForVast.Id,
-		&startDate,
-		&endDate,
-		&campaignPayloadForVast.AdId,
-		&campaignPayloadForVast.AdName,
-		&campaignPayloadForVast.AdDuration,
-		&campaignPayloadForVast.AdCreativeId,
-		&campaignPayloadForVast.AdCreativeUrl,
-	)
-	if err != nil {
-		//TODO: return custom error message
-		return nil, err
-	}
-	// If found, check if campaign is active
-	isCampaignActive, err := checkIsCampaignActive(startDate, endDate)
+	isCampaignActive, err := checkIsCampaignActive(campaign.StartDate, campaign.EndDate)
 	if err != nil {
 		//TODO: return custom error message
 		return nil, err
@@ -234,9 +197,9 @@ func (s *VastResponseRepo) GetByDma(ctx context.Context, dmaId int64) (*VAST, er
 
 	var vast *VAST
 	if !isCampaignActive {
-		campaignPayloadForVast = CampaignPayloadForVast{}
+		campaign = &Campaign{}
 	}
-	vast, err = constructVast(&campaignPayloadForVast)
+	vast, err = constructVast(campaign)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -244,7 +207,7 @@ func (s *VastResponseRepo) GetByDma(ctx context.Context, dmaId int64) (*VAST, er
 	return vast, nil
 }
 
-func constructVast(campaignPayload *CampaignPayloadForVast) (*VAST, error) {
+func constructVast(campaignPayload *Campaign) (*VAST, error) {
 	log.Print("vastResponse.constructVast")
 	var vast = &VAST{}
 	if campaignPayload.Id == 0 {
@@ -342,6 +305,7 @@ func constructVast(campaignPayload *CampaignPayloadForVast) (*VAST, error) {
 	return vast, nil
 }
 
+// TODO: Think about if this would make more sense to live elsewhere
 func checkIsCampaignActive(startDate string, endDate string) (bool, error) {
 	log.Println("vastResponse.checkIsCampaignActive()")
 	// Convert startDate and endDate to timestamps
