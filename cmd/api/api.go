@@ -32,7 +32,7 @@ func (app *application) mount() http.Handler {
 	mux.HandleFunc("GET /campaigns/{id}", app.getCampaignById)
 	mux.HandleFunc("POST /campaigns", app.createCampaignHandler)
 	mux.HandleFunc("DELETE /campaigns/{id}", app.deleteCampaignHandler)
-	mux.HandleFunc("PUT /campaings/{id}", app.updateCampaignHandler)
+	mux.HandleFunc("PUT /campaigns/{id}", app.updateCampaignHandler)
 
 	return mux
 }

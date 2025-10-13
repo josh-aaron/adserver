@@ -123,5 +123,35 @@ func (app *application) createCampaignHandler(w http.ResponseWriter, r *http.Req
 }
 
 func (app *application) updateCampaignHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("createCampaignHandler()")
+	log.Println("updateCampaignHandler()")
+	campaignIdParam := r.PathValue("id")
+	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var updatedCampaign model.Campaign
+	err = json.NewDecoder(r.Body).Decode(&updatedCampaign)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	ctx := r.Context()
+	err = app.repository.Campaign.Update(ctx, campaignIdInt, &updatedCampaign)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	js, err := json.Marshal(updatedCampaign)
+
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Write(js)
+
 }

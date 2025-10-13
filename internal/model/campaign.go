@@ -83,7 +83,8 @@ func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 	log.Println("campaign.Create()")
 	query := `
 	INSERT INTO campaign (name, start_date, end_date, target_dma_id, ad_id, ad_name, ad_duration, ad_creative_id, ad_creative_url)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+	RETURNING id
 	`
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
@@ -111,8 +112,37 @@ func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 	return nil
 }
 
-func (s *CampaignRepo) Update(ctx context.Context, campaignId int64) error {
+func (s *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *Campaign) error {
 	log.Println("campaign.Update()")
+	query := `
+		UPDATE campaign
+		SET name = $1, start_date = $2, end_date = $3, target_dma_id = $4, ad_id = $5, ad_name = $6, ad_duration = $7, ad_creative_id = $8, ad_creative_url = $9
+		WHERE id = $10
+		RETURNING id
+	`
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	err := s.db.QueryRowContext(
+		ctx,
+		query,
+		campaign.Name,
+		campaign.StartDate,
+		campaign.EndDate,
+		campaign.TargetDmaId,
+		campaign.AdId,
+		campaign.AdName,
+		campaign.AdDuration,
+		campaign.AdCreativeId,
+		campaign.AdCreativeUrl,
+		campaignId,
+	).Scan(
+		&campaign.Id,
+	)
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }
