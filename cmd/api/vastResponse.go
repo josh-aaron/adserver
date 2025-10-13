@@ -32,6 +32,5 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	w.WriteHeader(http.StatusOK)
 	w.Write(vastXml)
 }

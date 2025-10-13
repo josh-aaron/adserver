@@ -225,23 +225,33 @@ func (s *VastResponseRepo) GetByDma(ctx context.Context, dmaId int64) (*VAST, er
 	var vast *VAST
 	if isCampaignActive {
 		vast, err = constructVast(&campaign)
-		if err != nil {
-			log.Println(err)
-			return nil, err
+	} else {
+		vast, err = constructVast(&Campaign{})
+	}
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	return vast, nil
+}
+
+func constructVast(campaign *Campaign) (*VAST, error) {
+	log.Print("vastResponse.constructVast")
+	var vast = &VAST{}
+	if campaign.Id == 0 {
+		log.Print("vastResponse.constructVast campaign is inactive, return empty VAST")
+		vast = &VAST{
+			Version: "3.0",
+			Ads:     []Ad{},
 		}
 		return vast, nil
 	}
 
-	return nil, nil
-}
-
-func constructVast(campaign *Campaign) (*VAST, error) {
-
 	//TODO: Refactor with methods to instantiate each struct
-	vast := &VAST{
+	vast = &VAST{
 		Version: "3.0",
 		Ads: []Ad{
-			Ad{
+			{
 				ID: campaign.AdId,
 				InLine: &InLine{
 					AdSystem: &AdSystem{
@@ -256,16 +266,16 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 					},
 					Errors: []CDATAString{
 						//TODO: update beacons with unique transaction ID for tracking purposes
-						CDATAString{"http://example.com/error"},
+						{"http://example.com/error"},
 					},
 					Impressions: []Impression{
-						Impression{
+						{
 							ID:  "Impression-ID-01",
 							URI: "http://example.com/error",
 						},
 					},
 					Creatives: []Creative{
-						Creative{
+						{
 							ID:       campaign.AdCreativeId,
 							Sequence: 1,
 							Linear: &Linear{
@@ -273,25 +283,25 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 								Duration: "00:00:15",
 								TrackingEvents: []Tracking{
 									//TODO: UPDATE TRACKING WITH REST OF QUARTILES
-									Tracking{
+									{
 										Event: "start",
 										URI:   "http://example.com/tracking/start",
 									},
-									Tracking{
+									{
 										Event: "complete",
 										URI:   "http://example.com/tracking/complete",
 									},
 								},
 								VideoClicks: &VideoClicks{
 									ClickThroughs: []VideoClick{
-										VideoClick{
+										{
 											ID:  "ClickThrough-Impression-01",
 											URI: "http://iabtechlab.com",
 										},
 									},
 								},
 								MediaFiles: []MediaFile{
-									MediaFile{
+									{
 										ID:                  "5241",
 										Delivery:            "progressive",
 										Type:                "video/mp4",
@@ -310,7 +320,7 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 						},
 					},
 					Extensions: &[]Extension{
-						Extension{
+						{
 							Type: "iab-Count",
 							Data: []byte(`<total_available><![CDATA[ 2 ]]></total_available>`),
 						},
