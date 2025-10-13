@@ -13,11 +13,15 @@ type Repository struct {
 		GetAll(context.Context) ([]Campaign, error)
 		GetById(context.Context, int64) (*Campaign, error)
 	}
+	VastResponse interface {
+		GetByDma(context.Context, int64) (*VAST, error)
+	}
 }
 
 func NewRepository(db *sql.DB) Repository {
 	return Repository{
-		Campaign: &CampaignRepo{db},
+		Campaign:     &CampaignRepo{db},
+		VastResponse: &VastResponseRepo{db},
 	}
 
 }
