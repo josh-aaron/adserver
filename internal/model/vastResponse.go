@@ -186,48 +186,57 @@ type VastResponseRepo struct {
 	db *sql.DB
 }
 
+type CampaignPayloadForVast struct {
+	Id            int64  `json:"id"`
+	AdId          int    `json:"adId"`
+	AdName        string `json:"adName"`
+	AdDuration    int    `json:"adDuration"`
+	AdCreativeId  int    `json:"adCreativeId"`
+	AdCreativeUrl string `json:"adCreativeUrl"`
+}
+
 func (s *VastResponseRepo) GetByDma(ctx context.Context, dmaId int64) (*VAST, error) {
 	log.Println("vastResponse.GetByDma()")
 
 	// Find campaign by dmaID
 	query := `
-	SELECT id, name, start_date, end_date, target_dma_id, ad_id, ad_name, ad_duration, ad_creative_id, ad_creative_url 
+	SELECT id, start_date, end_date, ad_id, ad_name, ad_duration, ad_creative_id, ad_creative_url 
 	FROM campaign 
 	WHERE target_dma_id = $1
 	`
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 
-	var campaign Campaign
+	var startDate string
+	var endDate string
+
+	var campaignPayloadForVast CampaignPayloadForVast
 	err := s.db.QueryRowContext(ctx, query, dmaId).Scan(
-		&campaign.Id,
-		&campaign.Name,
-		&campaign.StartDate,
-		&campaign.EndDate,
-		&campaign.TargetDmaId,
-		&campaign.AdId,
-		&campaign.AdName,
-		&campaign.AdDuration,
-		&campaign.AdCreativeId,
-		&campaign.AdCreativeUrl,
+		&campaignPayloadForVast.Id,
+		&startDate,
+		&endDate,
+		&campaignPayloadForVast.AdId,
+		&campaignPayloadForVast.AdName,
+		&campaignPayloadForVast.AdDuration,
+		&campaignPayloadForVast.AdCreativeId,
+		&campaignPayloadForVast.AdCreativeUrl,
 	)
 	if err != nil {
 		//TODO: return custom error message
 		return nil, err
 	}
 	// If found, check if campaign is active
-	isCampaignActive, err := checkIsCampaignActive(campaign.StartDate, campaign.EndDate)
+	isCampaignActive, err := checkIsCampaignActive(startDate, endDate)
 	if err != nil {
 		//TODO: return custom error message
 		return nil, err
 	}
 
 	var vast *VAST
-	if isCampaignActive {
-		vast, err = constructVast(&campaign)
-	} else {
-		vast, err = constructVast(&Campaign{})
+	if !isCampaignActive {
+		campaignPayloadForVast = CampaignPayloadForVast{}
 	}
+	vast, err = constructVast(&campaignPayloadForVast)
 	if err != nil {
 		log.Println(err)
 		return nil, err
@@ -235,10 +244,10 @@ func (s *VastResponseRepo) GetByDma(ctx context.Context, dmaId int64) (*VAST, er
 	return vast, nil
 }
 
-func constructVast(campaign *Campaign) (*VAST, error) {
+func constructVast(campaignPayload *CampaignPayloadForVast) (*VAST, error) {
 	log.Print("vastResponse.constructVast")
 	var vast = &VAST{}
-	if campaign.Id == 0 {
+	if campaignPayload.Id == 0 {
 		log.Print("vastResponse.constructVast campaign is inactive, return empty VAST")
 		vast = &VAST{
 			Version: "3.0",
@@ -252,13 +261,13 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 		Version: "3.0",
 		Ads: []Ad{
 			{
-				ID: campaign.AdId,
+				ID: campaignPayload.AdId,
 				InLine: &InLine{
 					AdSystem: &AdSystem{
 						Version: "4.0",
 						Name:    "Rockbot",
 					},
-					AdTitle: CDATAString{campaign.AdName},
+					AdTitle: CDATAString{campaignPayload.AdName},
 					Pricing: &Pricing{
 						Model:    "cpm",
 						Currency: "USD",
@@ -276,7 +285,7 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 					},
 					Creatives: []Creative{
 						{
-							ID:       campaign.AdCreativeId,
+							ID:       campaignPayload.AdCreativeId,
 							Sequence: 1,
 							Linear: &Linear{
 								//TODO: UPDATE COLUMN TO BE EXPRESSED AS STRING IN THE FORMAT BELOW
@@ -313,7 +322,7 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 										MaxBitrate:          1080,
 										Scalable:            true,
 										MaintainAspectRatio: true,
-										URI:                 campaign.AdCreativeUrl,
+										URI:                 campaignPayload.AdCreativeUrl,
 									},
 								},
 							},
