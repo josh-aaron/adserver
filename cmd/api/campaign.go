@@ -32,7 +32,7 @@ func (app *application) getCampaignsHandler(w http.ResponseWriter, r *http.Reque
 
 }
 
-func (app *application) getCampaignById(w http.ResponseWriter, r *http.Request) {
+func (app *application) getCampaignByIdHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("getCampaignsHandler()")
 	campaignIdParam := r.PathValue("id")
 	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
@@ -153,5 +153,4 @@ func (app *application) updateCampaignHandler(w http.ResponseWriter, r *http.Req
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	w.Write(js)
-
 }
