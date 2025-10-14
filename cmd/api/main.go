@@ -12,8 +12,10 @@ import (
 
 func main() {
 
+	env.LoadEnv()
+
 	config := config{
-		addr: env.GetString("ADDR", ":8080"),
+		addr: env.GetString("PORT", ":8080"),
 		db: dbConfig{
 			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/adserver?sslmode=disable"),
 			maxOpenConns: 30,
