@@ -207,10 +207,10 @@ func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign) (*VA
 	return vast, nil
 }
 
-func constructVast(campaignPayload *Campaign) (*VAST, error) {
+func constructVast(campaign *Campaign) (*VAST, error) {
 	log.Print("vastResponse.constructVast")
 	var vast = &VAST{}
-	if campaignPayload.Id == 0 {
+	if campaign.Id == 0 {
 		log.Print("vastResponse.constructVast campaign is inactive, return empty VAST")
 		vast = &VAST{
 			Version: "3.0",
@@ -224,13 +224,13 @@ func constructVast(campaignPayload *Campaign) (*VAST, error) {
 		Version: "3.0",
 		Ads: []Ad{
 			{
-				ID: campaignPayload.AdId,
+				ID: campaign.AdId,
 				InLine: &InLine{
 					AdSystem: &AdSystem{
 						Version: "4.0",
 						Name:    "Rockbot",
 					},
-					AdTitle: CDATAString{campaignPayload.AdName},
+					AdTitle: CDATAString{campaign.AdName},
 					Pricing: &Pricing{
 						Model:    "cpm",
 						Currency: "USD",
@@ -248,7 +248,7 @@ func constructVast(campaignPayload *Campaign) (*VAST, error) {
 					},
 					Creatives: []Creative{
 						{
-							ID:       campaignPayload.AdCreativeId,
+							ID:       campaign.AdCreativeId,
 							Sequence: 1,
 							Linear: &Linear{
 								//TODO: UPDATE COLUMN TO BE EXPRESSED AS STRING IN THE FORMAT BELOW
@@ -285,7 +285,7 @@ func constructVast(campaignPayload *Campaign) (*VAST, error) {
 										MaxBitrate:          1080,
 										Scalable:            true,
 										MaintainAspectRatio: true,
-										URI:                 campaignPayload.AdCreativeUrl,
+										URI:                 campaign.AdCreativeUrl,
 									},
 								},
 							},
