@@ -1,5 +1,11 @@
 package model
 
+import "errors"
+
+var (
+	ErrNotFound = errors.New("resource not found")
+)
+
 // The following consts comprise the hardcoded data for the VAST response.
 // The const names camelcase since they are not exported outside the model package.
 const vastXsiNamespace = "http://www.w3.org/2001/XMLSchema"

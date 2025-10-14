@@ -136,11 +136,15 @@ func (s *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *C
 		campaign.AdCreativeId,
 		campaign.AdCreativeUrl,
 		campaignId,
-	).Scan(
-		&campaign.Id,
-	)
+	).Scan(&campaign.Id)
 	if err != nil {
-		return err
+		log.Println(err)
+		switch err {
+		case sql.ErrNoRows:
+			return ErrNotFound
+		default:
+			return err
+		}
 	}
 
 	return nil
@@ -149,6 +153,7 @@ func (s *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *C
 
 func (s *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign, error) {
 	log.Println("campaign.GetById()")
+
 	query := `SELECT * FROM campaign WHERE id = $1`
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
@@ -166,9 +171,13 @@ func (s *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign
 		&campaign.AdCreativeId,
 		&campaign.AdCreativeUrl,
 	)
-
 	if err != nil {
-		return nil, err
+		switch err {
+		case sql.ErrNoRows:
+			return nil, ErrNotFound
+		default:
+			return nil, err
+		}
 	}
 
 	return &campaign, nil
