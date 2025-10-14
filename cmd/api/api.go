@@ -2,20 +2,24 @@ package main
 
 import (
 	"log"
+	"net"
 	"net/http"
 	"time"
 
 	"github.com/josh-aaron/adserver/internal/model"
+	"github.com/josh-aaron/adserver/internal/ratelimiter"
 )
 
 type application struct {
-	config     config
-	repository model.Repository
+	config      config
+	repository  model.Repository
+	rateLimiter ratelimiter.Limiter
 }
 
 type config struct {
-	addr string
-	db   dbConfig
+	addr        string
+	db          dbConfig
+	rateLimiter ratelimiter.Config
 }
 
 type dbConfig struct {
@@ -36,7 +40,7 @@ func (app *application) mount() http.Handler {
 	mux.HandleFunc("PUT /campaigns/{id}", app.updateCampaignHandler)
 
 	// /ads?dma={dmaId}&
-	mux.HandleFunc("GET /ads", app.getVastHandler)
+	mux.Handle("GET /ads", app.RateLimiterMiddleware(http.HandlerFunc(app.getVastHandler)))
 
 	return mux
 }
@@ -54,4 +58,28 @@ func (app *application) run(handler http.Handler) error {
 	log.Printf("server has started at %s", app.config.addr)
 
 	return server.ListenAndServe()
+}
+
+func (app *application) RateLimiterMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		ip := app.getIpHost(r.RemoteAddr)
+
+		if allow, retryAfter := app.rateLimiter.Allow(ip); !allow {
+			w.Header().Set("Retry-After", retryAfter.String())
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusTooManyRequests)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (app *application) getIpHost(remoteAddr string) string {
+	ip, _, err := net.SplitHostPort(remoteAddr)
+	if err != nil {
+		log.Println(err)
+	}
+	return ip
 }

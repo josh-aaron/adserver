@@ -15,7 +15,7 @@ type Repository struct {
 		GetByDma(context.Context, int64) (*Campaign, error)
 	}
 	VastResponse interface {
-		GetVast(context.Context, *Campaign) (*VAST, error)
+		GetVast(context.Context, *Campaign, int) (*VAST, int, error)
 	}
 }
 

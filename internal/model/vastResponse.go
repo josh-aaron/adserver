@@ -186,13 +186,13 @@ type VastResponseRepo struct {
 	db *sql.DB
 }
 
-func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign) (*VAST, error) {
+func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, totalDuration int) (*VAST, int, error) {
 	log.Println("vastResponse.GetByDma()")
 
 	isCampaignActive, err := checkIsCampaignActive(campaign.StartDate, campaign.EndDate)
 	if err != nil {
 		//TODO: return custom error message
-		return nil, err
+		return nil, 0, err
 	}
 
 	var vast *VAST
@@ -202,12 +202,23 @@ func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign) (*VA
 	vast, err = constructVast(campaign)
 	if err != nil {
 		log.Println(err)
-		return nil, err
+		return nil, 0, err
 	}
-	return vast, nil
+
+	vastDuration := calculateTotalDuration(vast)
+
+	return vast, vastDuration, nil
+}
+
+func calculateTotalDuration(vast *VAST) int {
+	// TODO: Currently, every VAST that is returned contains one Creative that is 15 seconds long.
+	// We would need to update this logic to find the sum of the duration within every Linear node in the VAST.
+	return 15
 }
 
 func constructVast(campaign *Campaign) (*VAST, error) {
+	//TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
+	// ad selection logic to ensure that we do not exceed the limit,
 	log.Print("vastResponse.constructVast")
 	var vast = &VAST{}
 	if campaign.Id == 0 {

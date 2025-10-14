@@ -2,10 +2,12 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/josh-aaron/adserver/internal/db"
 	"github.com/josh-aaron/adserver/internal/env"
 	"github.com/josh-aaron/adserver/internal/model"
+	"github.com/josh-aaron/adserver/internal/ratelimiter"
 )
 
 func main() {
@@ -17,6 +19,10 @@ func main() {
 			maxOpenConns: 30,
 			maxIdleConns: 30,
 			maxIdleTime:  "15m",
+		},
+		rateLimiter: ratelimiter.Config{
+			AdDurationLimit: 300,
+			TimeFrame:       time.Minute * 60,
 		},
 	}
 
@@ -31,9 +37,15 @@ func main() {
 
 	repository := model.NewRepository(db)
 
+	rateLimiter := ratelimiter.NewFixedWindowLimiter(
+		config.rateLimiter.AdDurationLimit,
+		config.rateLimiter.TimeFrame,
+	)
+
 	app := &application{
-		config:     config,
-		repository: repository,
+		config:      config,
+		repository:  repository,
+		rateLimiter: rateLimiter,
 	}
 
 	mux := app.mount()
