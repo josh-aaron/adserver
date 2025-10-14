@@ -33,7 +33,7 @@ func (app *application) getCampaignsHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (app *application) getCampaignByIdHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("getCampaignsHandler()")
+	log.Println("getCampaignById()")
 	campaignIdParam := r.PathValue("id")
 	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
 	if err != nil {
