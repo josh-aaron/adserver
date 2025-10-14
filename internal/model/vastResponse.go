@@ -213,6 +213,10 @@ func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, tota
 func calculateTotalDuration(vast *VAST) int {
 	// TODO: Currently, every VAST that is returned contains one Creative that is 15 seconds long.
 	// We would need to update this logic to find the sum of the duration within every Linear node in the VAST.
+	if len(vast.Ads) == 0 {
+		return 0
+	}
+
 	return 15
 }
 
