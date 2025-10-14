@@ -13,7 +13,8 @@ import (
 
 type VAST struct {
 	// The version of the VAST spec
-	Version string `xml:"version,attr"`
+	Version      string `xml:"version,attr"`
+	XsiNamespace string `xml:"xmlns:xs,attr"`
 	// One or more Ad elements. Advertisers and video content publishers may
 	// associate an <Ad> element with a line item video ad defined in contract
 	// documentation, usually an insertion order. These line item ads typically
@@ -191,7 +192,7 @@ func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, tota
 
 	isCampaignActive, err := checkIsCampaignActive(campaign.StartDate, campaign.EndDate)
 	if err != nil {
-		//TODO: return custom error message
+		// TODO: return custom error message
 		return nil, 0, err
 	}
 
@@ -221,85 +222,88 @@ func calculateTotalDuration(vast *VAST) int {
 }
 
 func constructVast(campaign *Campaign) (*VAST, error) {
-	//TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
+	// TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
 	// ad selection logic to ensure that we do not exceed the limit,
 	log.Print("vastResponse.constructVast")
 	var vast = &VAST{}
 	if campaign.Id == 0 {
 		log.Print("vastResponse.constructVast campaign is inactive, return empty VAST")
 		vast = &VAST{
-			Version: "3.0",
-			Ads:     []Ad{},
+			Version:      vastVersion,
+			XsiNamespace: vastXsiNamespace,
+			Ads:          []Ad{},
 		}
 		return vast, nil
 	}
 
-	//TODO: Refactor with methods to instantiate each struct
+	// TODO: Refactor with methods to instantiate each struct
 	vast = &VAST{
-		Version: "3.0",
+		Version:      vastVersion,
+		XsiNamespace: vastXsiNamespace,
 		Ads: []Ad{
 			{
 				ID: campaign.AdId,
 				InLine: &InLine{
 					AdSystem: &AdSystem{
-						Version: "4.0",
-						Name:    "Rockbot",
+						Version: adSystemVersion,
+						Name:    adSystemName,
 					},
 					AdTitle: CDATAString{campaign.AdName},
 					Pricing: &Pricing{
-						Model:    "cpm",
-						Currency: "USD",
-						Value:    "25.00",
+						Model:    pricingModel,
+						Currency: pricingCurrency,
+						Value:    pricingValue,
 					},
 					Errors: []CDATAString{
-						//TODO: update beacons with unique transaction ID for tracking purposes
-						{"http://example.com/error"},
+						// TODO: update beacons with unique transaction ID for tracking purposes
+						{errorURI},
 					},
 					Impressions: []Impression{
+						// In a real life scenario, the ImpressionId and URI would be dynamically generated for tracking purposes
 						{
-							ID:  "Impression-ID-01",
-							URI: "http://example.com/error",
+							ID:  impressionId,
+							URI: impressionURI,
 						},
 					},
 					Creatives: []Creative{
 						{
 							ID:       campaign.AdCreativeId,
-							Sequence: 1,
+							Sequence: sequence,
 							Linear: &Linear{
-								//TODO: UPDATE COLUMN TO BE EXPRESSED AS STRING IN THE FORMAT BELOW
-								Duration: "00:00:15",
+								// TODO: UPDATE COLUMN TO BE EXPRESSED AS STRING IN THE FORMAT BELOW
+								Duration: linearDuration,
 								TrackingEvents: []Tracking{
-									//TODO: UPDATE TRACKING WITH REST OF QUARTILES
+									// TODO: UPDATE TRACKING WITH REST OF QUARTILES
 									{
-										Event: "start",
-										URI:   "http://example.com/tracking/start",
+										Event: trackingEventStart,
+										URI:   trackingEventStartURI,
 									},
 									{
-										Event: "complete",
-										URI:   "http://example.com/tracking/complete",
+										Event: trackingEventComplete,
+										URI:   trackingEventCompleteURI,
 									},
 								},
 								VideoClicks: &VideoClicks{
 									ClickThroughs: []VideoClick{
 										{
-											ID:  "ClickThrough-Impression-01",
-											URI: "http://iabtechlab.com",
+											ID:  clickThroughId,
+											URI: clickThroughURI,
 										},
 									},
 								},
 								MediaFiles: []MediaFile{
 									{
-										ID:                  "5241",
-										Delivery:            "progressive",
-										Type:                "video/mp4",
-										Codec:               "",
-										Bitrate:             500,
-										Width:               400,
-										Height:              300,
-										MinBitrate:          360,
-										MaxBitrate:          1080,
-										Scalable:            true,
-										MaintainAspectRatio: true,
+										ID:                  mediaFileId,
+										Delivery:            mediaFileDelivery,
+										Type:                mediaFileType,
+										Codec:               mediaFileCodec,
+										Bitrate:             mediaFileBitrate,
+										Width:               mediaFileWidth,
+										Height:              mediaFileHeight,
+										MinBitrate:          mediaFileMinBitrate,
+										MaxBitrate:          mediaFileMaxBitrate,
+										Scalable:            mediaFileScalable,
+										MaintainAspectRatio: mediaFileMaintainAspectRation,
 										URI:                 campaign.AdCreativeUrl,
 									},
 								},
@@ -308,8 +312,8 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 					},
 					Extensions: &[]Extension{
 						{
-							Type: "iab-Count",
-							Data: []byte(`<total_available><![CDATA[ 2 ]]></total_available>`),
+							Type: extensionType,
+							Data: []byte(extensionData),
 						},
 					},
 				},
