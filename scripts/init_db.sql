@@ -1,1 +1,1 @@
-CREATE DATABASE adserver_test;
+CREATE DATABASE adserver;
