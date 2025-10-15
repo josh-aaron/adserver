@@ -12,7 +12,7 @@ Welcome to the README for the adserver project!
 ## Verification Steps
 1. Clone repo
 2. Download/install Postgres
-3. Create a .env file (copy .env.SAMPLE) and update with your Postgres username and password
+3. Create a .env file in the main directory (can copy .env.SAMPLE) and update with your Postgres username, password, and preferred port for the HTTP server
 4. Create the adserver DB
     First connect to the psql shell
     ```
