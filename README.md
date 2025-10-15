@@ -1,6 +1,6 @@
 # adserver
 
-Welcome to the README for the adserver project.
+Welcome to the README for the adserver project!
 
 ## Tech Stack, Dependencies
 - Go 1.25.2
@@ -11,8 +11,9 @@ Welcome to the README for the adserver project.
 
 ## Verification Steps
 1. Clone repo
-2. Download/set up postgres
-3. Create the adserver DB
+2. Download/install Postgres
+3. Create a .env file (copy .env.SAMPLE) and update with your Postgres username and password
+4. Create the adserver DB
     First connect to the psql shell
     ```
     psql -U {username}
@@ -21,13 +22,13 @@ Welcome to the README for the adserver project.
     ```
     \i scripts/init_db.sql
     ```
-4. Run the migrations to set up the tables
-5. Run ```make run``` in the terminal to build and run the executable
-6. Use the curl commands in curl-commands.txt to create some campaign data, or leverage an API testing tool like Postman or Thunderclient
-7. Test the other available Campaign API endpoints
-8. Use the adrequest endpoint to retrieve a VAST response
-9. Enter the VAST XML into an online VAST validator (e.g., https://tools.springserve.com/tagtest) and watch the ad play!
-10. Run ```make test``` to run the unit tests
+5. Run the migrations to set up the tables
+6. Run ```make run``` in the terminal to build and run the executable
+7. Use the curl commands in curl-commands.txt to create some campaign data, or leverage an API testing tool like Postman or Thunderclient
+8. Test the other available Campaign API endpoints
+9. Use the adrequest endpoint to retrieve a VAST response
+10. Enter the VAST XML into an online VAST validator (e.g., https://tools.springserve.com/tagtest) and watch the ad play!
+11. Run ```make test``` to run the unit tests
 
 ## Assumptions and Limitations
 
@@ -48,11 +49,17 @@ Welcome to the README for the adserver project.
 3. Strike a balance between familiar tech and learning opportunities
 
 ## Implementation Decisions, Considerations, Tradeoffs
+WIP
 - Tech stack
+    - Goal was to use as few external packages/dependencies as possile
+    - Postgres vs. MySQL
 - Architecture/project set up
+    - Combined service layer into repository layer
+    - However, based on the complexity of the vast response service logic, it may have made more sense to separate out the business logic from the model
 - Campaign API
 - Ad Request API
 - Rate Limiting
+
 
 ## Future Enhancements and Considerations
 
@@ -85,9 +92,10 @@ Welcome to the README for the adserver project.
     - Can alo use ELK stack (Elasticsearch, Logstash, Kibana)
 - Campaign Active vs. Inactive 
     - Run chronjob daily to designate campaign as active/inactive based on date that chronjob is run
-    - Will optimize ad response process by reducing the number of steps/calculations required
+    - May optimize ad response process by reducing the number of steps/calculations required
 
 ## New Experiences, Lessons Learned, and Takeaways
+WIP
 
 ## Implementation Decision Making Hieracrhy
 1. Leverage past experience from similar projects
