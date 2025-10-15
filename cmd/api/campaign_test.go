@@ -19,7 +19,6 @@ func TestGetCampaign(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-
 		requestRecorder := httptest.NewRecorder()
 		mux.ServeHTTP(requestRecorder, req)
 
@@ -44,6 +43,5 @@ func TestGetCampaign(t *testing.T) {
 		if expectedCampaign != actualCampaign {
 			t.Error("expected campaign does not match actual campaign")
 		}
-
 	})
 }

@@ -40,7 +40,7 @@ func (app *application) mount() http.Handler {
 	mux.HandleFunc("PUT /campaigns/{id}", app.updateCampaignHandler)
 
 	// /ads?dma={dmaId}&
-	mux.Handle("GET /ads", app.RateLimiterMiddleware(http.HandlerFunc(app.getVastHandler)))
+	mux.Handle("GET /ads", app.rateLimiterMiddleware(http.HandlerFunc(app.getVastHandler)))
 
 	return mux
 }
@@ -60,7 +60,7 @@ func (app *application) run(handler http.Handler) error {
 	return server.ListenAndServe()
 }
 
-func (app *application) RateLimiterMiddleware(next http.Handler) http.Handler {
+func (app *application) rateLimiterMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		ip := app.getIpHost(r.RemoteAddr)

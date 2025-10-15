@@ -9,6 +9,8 @@ import (
 
 func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	println("getVastResponseHandler()")
+	w.Header().Set("Content-Type", "application/xml")
+
 	queryParams := r.URL.Query()
 	dmaIdParam := queryParams.Get("dma")
 	dmaIdInt, err := strconv.ParseInt(dmaIdParam, 10, 64)
@@ -33,14 +35,13 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 
 	vast, vastDuration, err := app.repository.VastResponse.GetVast(ctx, campaign, currentDurationServed)
 	log.Printf("getVastResponseHandler new currentDurationServed: %v", vastDuration)
-
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 	app.rateLimiter.UpdateCurrentAdDurationServed(ip, vastDuration)
 
-	w.Header().Set("Content-Type", "application/xml")
 	vastXml, err := xml.MarshalIndent(vast, "", "  ")
 	if err != nil {
 		log.Print(err)

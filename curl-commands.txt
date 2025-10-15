@@ -1,0 +1,76 @@
+#### GET ####
+
+curl -X GET localhost:8080/campaigns
+
+curl -X GET localhost:8080/campaigns/{id}
+
+curl -X GET localhost:8080/ads?dma=501
+
+
+#### POST ####
+
+curl -X POST -H "Content-Type: application/json" -d '{
+    "name": "pepsi",
+    "startDate": "2025-10-12",
+    "endDate": "2026-01-01",
+    "targetDmaId": 803,
+    "adId": 1,
+    "adName": "ForBiggerBlazes",
+    "adDuration": 15,
+    "adCreativeId": 101,
+    "AdCreativeUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+}' localhost:8080/campaigns
+
+curl -X POST -H "Content-Type: application/json" -d '{
+    "name": "ford",
+    "startDate": "2025-10-12",
+    "endDate": "2026-01-01",
+    "targetDmaId": 501,
+    "adId": 2,
+    "adName": "ForBiggerEscapes",
+    "adDuration": 15,
+    "adCreativeId": 102,
+    "AdCreativeUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+}' localhost:8080/campaigns
+
+curl -X POST -H "Content-Type: application/json" -d '{
+    "name": "BMW",
+    "startDate": "2026-10-12",
+    "endDate": "2027-01-01",
+    "targetDmaId": 505,
+    "adId": 3,
+    "adName": "ForBiggerEscapes",
+    "adDuration": 15,
+    "adCreativeId": 103,
+    "AdCreativeUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+}' localhost:8080/campaigns
+
+curl -X POST -H "Content-Type: application/json" -d '{
+    "name": "Fender",
+    "startDate": "2024-01-01",
+    "endDate": "2025-01-01",
+    "targetDmaId": 807,
+    "adId": 4,
+    "adName": "ForBiggerEscapes",
+    "adDuration": 15,
+    "adCreativeId": 104,
+    "AdCreativeUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+}' localhost:8080/campaigns
+
+#### UPDATE ####
+
+curl -X PUT -H "Content-Type: application/json" -d '{
+    "name": "pepsi",
+    "startDate": "2025-09-12",
+    "endDate": "2026-01-01",
+    "targetDmaId": 803,
+    "adId": 1,
+    "adName": "ForBiggerBlazes",
+    "adDuration": 15,
+    "adCreativeId": 101,
+    "AdCreativeUrl": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
+}' localhost:8080/campaigns/{20}
+
+#### DELETE ####
+
+curl -X DELETE localhost:8080/campaigns/{id}
