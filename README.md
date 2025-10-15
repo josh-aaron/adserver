@@ -25,6 +25,7 @@ Welcome to the README for the adserver project!
 5. Run the migrations to set up the tables
 6. Run ```make run``` in the terminal to build and run the executable
 7. Use the curl commands in curl-commands.txt to create some campaign data, or leverage an API testing tool like Postman or Thunderclient
+    - Can find DMA codes here: https://www.spstechnical.com/DMACodes.htm
 8. Test the other available Campaign API endpoints
 9. Use the adrequest endpoint to retrieve a VAST response
 10. Enter the VAST XML into an online VAST validator (e.g., https://tools.springserve.com/tagtest) and watch the ad play!
@@ -34,12 +35,12 @@ Welcome to the README for the adserver project!
 
 - Only one publisher network (e.g., BobsAwesomeCatVideos.com is our only ad space publisher). Therefore, when any ad request is received, we only filter by targetDma and by if campaign is active
 - DMA code/id will be hardcoded into ad request
-- Ad and Creative data will live in the Campaign table. This is for ease of testing and updating using the exposed Campaign API endpoints. Testers can add/modify campaigns and see those changes reflected in the VAST response.
+- Ad and Creative data will live in the Campaign table. This is for ease of testing and updating the exposed Campaign API endpoints - i.e., testers can add/modify campaigns and see those changes reflected in the VAST response.
     - All other VAST data will be hardcoded.
     - The VAST response returned will only contain nodes outlined in the VAST 3.0 Inline Linear Example (https://github.com/InteractiveAdvertisingBureau/VAST_Samples/blob/master/VAST%203.0%20Samples/Inline_Linear_Tag-test.xml)
     - Excludes certain optional nodes (e.g., Wrapper, Non-Linear, Companion).
-- If DMA in request does not match any active campaign target DMA, no ad will return
-- A campaign will only have one DMA, 
+- If DMA in request does not match any active campaign target DMA, we will return an empty VAST
+- A campaign will only have one DMA
 - Only one ad/creative will be returned in the VAST response and all creatives will have a duration of 15 seconds
 - IP address from HTTP request will be used to identify "unique users" for rate limitng
 

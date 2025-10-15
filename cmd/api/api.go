@@ -10,6 +10,7 @@ import (
 	"github.com/josh-aaron/adserver/internal/ratelimiter"
 )
 
+// Leverage depenency injection so that our structs rely on behaviors, not specific implementations
 type application struct {
 	config      config
 	repository  model.Repository
@@ -39,7 +40,8 @@ func (app *application) mount() http.Handler {
 	mux.HandleFunc("DELETE /campaigns/{id}", app.deleteCampaignHandler)
 	mux.HandleFunc("PUT /campaigns/{id}", app.updateCampaignHandler)
 
-	// /ads?dma={dmaId}&
+	// Use query parameters for the ad request, i.e., /ads?dma={dmaId}&
+	// Wrap the getVastHandler in the rateLimiter middleware
 	mux.Handle("GET /ads", app.rateLimiterMiddleware(http.HandlerFunc(app.getVastHandler)))
 
 	return mux
@@ -65,6 +67,8 @@ func (app *application) rateLimiterMiddleware(next http.Handler) http.Handler {
 
 		ip := app.getIpHost(r.RemoteAddr)
 
+		// If we try to send another ad request after already hitting the limit, return a 429 HTTP error
+		//  with the amount of time until we can be served ads again in the 'Retry-after' header
 		if allow, retryAfter := app.rateLimiter.Allow(ip); !allow {
 			w.Header().Set("Retry-After", retryAfter.String())
 			w.Header().Set("Content-Type", "application/json")

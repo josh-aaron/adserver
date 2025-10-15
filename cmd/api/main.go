@@ -12,8 +12,10 @@ import (
 
 func main() {
 
+	// Load .env variables
 	env.LoadEnv()
 
+	// Initialize config struct, with required configurations for the server, db, and rateLimiter
 	config := config{
 		addr: env.GetString("PORT", ":8080"),
 		db: dbConfig{
@@ -28,6 +30,7 @@ func main() {
 		},
 	}
 
+	// Initialize the db,
 	db, err := db.New(config.db.addr, config.db.maxOpenConns, config.db.maxIdleConns, config.db.maxIdleTime)
 	if err != nil {
 		log.Print(err)
@@ -50,6 +53,9 @@ func main() {
 		rateLimiter: rateLimiter,
 	}
 
+	// Initialize the multiplexer, aka API router
 	mux := app.mount()
+
+	// If there's an error running the app, let's shut it down
 	log.Fatal(app.run(mux))
 }

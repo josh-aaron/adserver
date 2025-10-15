@@ -6,6 +6,8 @@ import (
 	"testing"
 )
 
+// Mock repo and interface method implementations to be used for testing
+
 func NewMockRepo() Repository {
 	return Repository{
 		Campaign: &MockCampaignRepo{

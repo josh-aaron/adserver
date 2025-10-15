@@ -7,6 +7,8 @@ import (
 	"github.com/josh-aaron/adserver/internal/ratelimiter"
 )
 
+// Helper function to create an instance of our application using mocked dependencies
+
 func newTestApplication(t *testing.T, config config) *application {
 	t.Helper()
 

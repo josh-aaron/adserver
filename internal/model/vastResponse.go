@@ -21,6 +21,7 @@ func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, tota
 		return nil, 0, err
 	}
 
+	// Check if the campaign is active or inactive. If inactive, let's return an emtpy VAST response
 	var vast *VAST
 	if !isCampaignActive {
 		campaign = &Campaign{}
@@ -36,9 +37,9 @@ func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, tota
 	return vast, vastDuration, nil
 }
 
+// TODO: Currently, every VAST that is returned contains one Creative that is 15 seconds long.
+// We would need to update this logic to find the sum of the duration within every Linear node in the VAST.
 func calculateTotalDuration(vast *VAST) int {
-	// TODO: Currently, every VAST that is returned contains one Creative that is 15 seconds long.
-	// We would need to update this logic to find the sum of the duration within every Linear node in the VAST.
 	if len(vast.Ads) == 0 {
 		return 0
 	}
@@ -46,9 +47,9 @@ func calculateTotalDuration(vast *VAST) int {
 	return 15
 }
 
+// TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
+// ad selection logic to ensure that we do not exceed the limit,
 func constructVast(campaign *Campaign) (*VAST, error) {
-	// TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
-	// ad selection logic to ensure that we do not exceed the limit,
 	log.Print("vastResponse.constructVast")
 	var vast = &VAST{}
 	if campaign.Id == 0 {
@@ -152,6 +153,7 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 // TODO: Think about if this would make more sense to live elsewhere
 func checkIsCampaignActive(startDate string, endDate string) (bool, error) {
 	log.Println("vastResponse.checkIsCampaignActive()")
+
 	// Convert startDate and endDate to timestamps
 	layout := "2006-01-02"
 

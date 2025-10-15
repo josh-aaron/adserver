@@ -9,6 +9,9 @@ import (
 	"github.com/josh-aaron/adserver/internal/model"
 )
 
+// Use Go's built in testing library along with the mock structs, methods, and data
+// TODO: write tests for the rest of the Campaign API, VAST API, and rate limiter
+
 func TestGetCampaign(t *testing.T) {
 
 	app := newTestApplication(t, config{})

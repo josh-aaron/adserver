@@ -24,10 +24,14 @@ func NewFixedWindowLimiter(adDurationLimit int, window time.Duration) *FixedWind
 func (rl *FixedWindowRateLimiter) Allow(ip string) (bool, time.Duration) {
 	log.Printf("FixedWindowRateLimiter Allow() for ip %v", ip)
 
+	// Use locks to prevent race conditions
 	rl.RLock()
 	currentAdDurationServed, exists := rl.clients[ip]
 	rl.RUnlock()
 
+	// If we haven't seen the IP before, OR if we have but the IP hasn't reached its ad duration limit,
+	// then allow the request to proceed to the getVastHandler. If it's a new IP, start a
+	// Go routine to manage resetting the duration served in one hour.
 	if !exists || currentAdDurationServed < rl.adDurationLimit {
 		rl.Lock()
 		if !exists {
@@ -40,6 +44,7 @@ func (rl *FixedWindowRateLimiter) Allow(ip string) (bool, time.Duration) {
 	return false, rl.window
 }
 
+// After an IP address is
 func (rl *FixedWindowRateLimiter) resetCount(ip string) {
 	log.Printf("FixedWindowRateLimiter resetCount() for ip %v", ip)
 	time.Sleep(rl.window)
@@ -57,6 +62,7 @@ func (rl *FixedWindowRateLimiter) GetCurrentAdDurationServed(ip string) int {
 	return currentAdDurationServed
 }
 
+// Update the amount of ad duraiton we've served to an IP address with the duraiton from the latest returned VAST
 func (rl *FixedWindowRateLimiter) UpdateCurrentAdDurationServed(ip string, newAdDuration int) {
 	log.Printf("UpdateCurrentAdDurationServed for ip %v", ip)
 	rl.Lock()

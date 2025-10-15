@@ -5,6 +5,8 @@ import "time"
 // The structs below fulfill the VAST 3.0 Inline Linear Example (https://github.com/InteractiveAdvertisingBureau/VAST_Samples/blob/master/VAST%203.0%20Samples/Inline_Linear_Tag-test.xml
 // Excludes certain optional nodes (e.g., Wrapper, Non-Linear, Companion).
 
+// These structs were leveraged from github.com/rs/vast under the MIT License
+
 type VAST struct {
 	// The version of the VAST spec
 	Version      string `xml:"version,attr"`

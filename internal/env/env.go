@@ -10,6 +10,7 @@ func LoadEnv() {
 	godotenv.Load()
 }
 
+// Helper function to lookup the environment variable, or use a fallback
 func GetString(key, fallback string) string {
 	val, ok := os.LookupEnv(key)
 	if !ok {
