@@ -6,3 +6,10 @@ run: build
 
 test:
 	go test -v ./...
+
+buildWindows:
+	cd cmd/api; \
+	go build -o ../../bin/adserver.exe
+
+runWindows: buildWindows
+	./bin/adserver.exe
