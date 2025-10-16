@@ -35,11 +35,12 @@ Welcome to the README for the adserver project! Please also refer to the WORKLOG
     - On Mac,  run ```make run``` in the terminal
     - On Windows,  run ```make runWindows``` in the terminal*
 
-7. Test the API endpoints! Use the curl commands (or snag the campaign JSON objects) in curl-commands.txt to create some campaign data, or leverage an API testing tool like Postman or Thunderclient
+7. Test the API endpoints! 
+    - Use the curl commands in curl-commands.txt to create some campaign data, or leverage an API testing tool like Postman or Thunderclient and snag the campaign JSON objects in curl-commands.txt
     - See the "API Documentation" section below for details
     - You can find market names mapped to DMA codes here: https://www.spstechnical.com/DMACodes.htm
 8. Test the other available Campaign API endpoints
-9. Use the adrequest endpoint to retrieve a VAST response
+9. Use the ad response endpoint to retrieve a VAST response
 10. Enter the VAST XML into an online VAST validator (e.g., https://tools.springserve.com/tagtest) and watch the ad play!
 11. Run ```make test``` to run the unit tests
 
