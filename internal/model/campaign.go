@@ -184,7 +184,7 @@ func (s *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign
 }
 
 func (s *CampaignRepo) GetByDma(ctx context.Context, campaignId int64) (*Campaign, error) {
-	log.Println("campaign.GetById()")
+	log.Println("campaign.GetByDma()")
 	query := `SELECT * FROM campaign WHERE target_dma_id = $1`
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()

@@ -22,7 +22,7 @@ func NewFixedWindowLimiter(adDurationLimit int, window time.Duration) *FixedWind
 }
 
 func (rl *FixedWindowRateLimiter) Allow(ip string) (bool, time.Duration) {
-	log.Printf("FixedWindowRateLimiter Allow() for ip %v", ip)
+	log.Printf("FixedWindowRateLimiter.Allow() for ip %v", ip)
 
 	// Use locks to prevent race conditions
 	rl.RLock()
@@ -46,16 +46,15 @@ func (rl *FixedWindowRateLimiter) Allow(ip string) (bool, time.Duration) {
 
 // After an IP address is
 func (rl *FixedWindowRateLimiter) resetCount(ip string) {
-	log.Printf("FixedWindowRateLimiter resetCount() for ip %v", ip)
+	log.Printf("FixedWindowRateLimiter.resetCount() for ip %v", ip)
 	time.Sleep(rl.window)
-	log.Printf("window: %v", rl.window)
 	rl.Lock()
 	delete(rl.clients, ip)
 	rl.Unlock()
 }
 
 func (rl *FixedWindowRateLimiter) GetCurrentAdDurationServed(ip string) int {
-	log.Printf("GetCurrentAdDurationServed for ip %v", ip)
+	log.Printf("FixedWindowRateLimiter.GetCurrentAdDurationServed for ip %v", ip)
 	rl.RLock()
 	currentAdDurationServed := rl.clients[ip]
 	rl.RUnlock()
@@ -64,7 +63,7 @@ func (rl *FixedWindowRateLimiter) GetCurrentAdDurationServed(ip string) int {
 
 // Update the amount of ad duraiton we've served to an IP address with the duraiton from the latest returned VAST
 func (rl *FixedWindowRateLimiter) UpdateCurrentAdDurationServed(ip string, newAdDuration int) {
-	log.Printf("UpdateCurrentAdDurationServed for ip %v", ip)
+	log.Printf("FixedWindowRateLimiter.UpdateCurrentAdDurationServed for ip %v", ip)
 	rl.Lock()
 	currentAdDurationServed := rl.clients[ip]
 	rl.clients[ip] = currentAdDurationServed + newAdDuration

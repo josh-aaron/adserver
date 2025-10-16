@@ -8,7 +8,7 @@ import (
 )
 
 func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
-	println("getVastResponseHandler()")
+	println("getVastHandler()")
 	w.Header().Set("Content-Type", "application/xml")
 
 	queryParams := r.URL.Query()
@@ -31,14 +31,11 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// If there's a business requirement to limit ad duraiton served, then a real adserver would probably want to incorporate the duration already served
+	// In the future, if there's a business requirement to limit ad duraiton served, then a real adserver would probably want to incorporate the duration already served
 	// into it's ad selection process, to ensure it's not breaching the limit. So, let's pass the currentDurationServed to the VAST response service.
 	ip := app.getIpHost(r.RemoteAddr)
 	currentDurationServed := app.rateLimiter.GetCurrentAdDurationServed(ip)
-	log.Printf("getVastResponseHandler currentDurationServed: %v", currentDurationServed)
-
 	vast, vastDuration, err := app.repository.VastResponse.GetVast(ctx, campaign, currentDurationServed)
-	log.Printf("getVastResponseHandler new currentDurationServed: %v", vastDuration)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

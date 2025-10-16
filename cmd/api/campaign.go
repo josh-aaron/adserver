@@ -29,7 +29,7 @@ func (app *application) getCampaignsHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (app *application) getCampaignByIdHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("getCampaignById()")
+	log.Println("getCampaignByIdHandler()")
 	w.Header().Set("Content-Type", "application/json")
 
 	campaignIdParam := r.PathValue("id")

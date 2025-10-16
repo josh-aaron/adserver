@@ -13,7 +13,7 @@ type VastResponseRepo struct {
 }
 
 func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, totalDuration int) (*VAST, int, error) {
-	log.Println("vastResponse.GetByDma()")
+	log.Println("vastResponse.GetVast()")
 
 	isCampaignActive, err := checkIsCampaignActive(campaign.StartDate, campaign.EndDate)
 	if err != nil {
