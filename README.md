@@ -57,7 +57,7 @@ Url must contain the ID of a campaign, as an int.
 
 Example:
 ```
-GET /campaigns/{1}
+GET /campaigns/30
 ```
 
 Success:
@@ -101,7 +101,7 @@ Request body must contain a JSON object of the campaign to be created.
 
 Example:
 ```
-POST /campaigns/{1}
+POST /campaigns/
 {
     "name": "fender",
     "startDate": "2024-01-01",
@@ -145,7 +145,7 @@ Response Body:
 
 Example:
 ```
-PUT /campaigns/{1}
+PUT /campaigns/6
 
 Response Body:
 {
@@ -178,7 +178,7 @@ Url must contain the ID of a campaign, as an int.
 
 Example:
 ```
-DELETE /campaigns/{1}
+DELETE /campaigns/7
 ```
 
 Success:
