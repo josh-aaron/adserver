@@ -19,3 +19,11 @@ func GetString(key, fallback string) string {
 	}
 	return val
 }
+
+func GetDBAddr() string {
+	_, err := os.Stat("/.dockerenv")
+	if err != nil {
+		return "DB_ADDR"
+	}
+	return "DOCKER_DB_ADDR"
+}

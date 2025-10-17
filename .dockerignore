@@ -1,0 +1,6 @@
+# Go build output
+bin/
+
+.git/
+
+*.env

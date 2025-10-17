@@ -14,13 +14,13 @@ func main() {
 
 	// Load .env variables
 	env.LoadEnv()
-
+	dbAddr := env.GetDBAddr()
 	// Initialize config struct, with required configurations for the server, db, and rateLimiter
 	config := config{
 		addr: env.GetString("PORT", ":8080"),
 		// TODO: update all other config fields to be ENV variables, or constants
 		db: dbConfig{
-			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/adserver?sslmode=disable"),
+			addr:         env.GetString(dbAddr, "postgres://admin:adminpassword@localhost/adserver?sslmode=disable"),
 			maxOpenConns: 30,
 			maxIdleConns: 30,
 			maxIdleTime:  "15m",
