@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -22,7 +23,7 @@ func (r *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, tota
 		campaign = &Campaign{}
 	}
 	// TODO: implement logic that will append the transactionId to the impression url and trackingEvent urls
-	vast, err := constructVast(campaign)
+	vast, err := constructVast(campaign, transactionId)
 	if err != nil {
 		log.Println(err)
 		return nil, 0, err
@@ -43,9 +44,15 @@ func calculateTotalDuration(vast *VAST) int {
 	return 15
 }
 
+func appendTransactionIdToUri(uri string, transactionId int64) string {
+	log.Printf("appendTransactionIdToUri, appending %v to %v", transactionId, uri)
+	transactionIdStr := strconv.FormatInt(transactionId, 10)
+	return uri + transactionIdStr
+}
+
 // TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
 // ad selection logic to ensure that we do not exceed the limit,
-func constructVast(campaign *Campaign) (*VAST, error) {
+func constructVast(campaign *Campaign, transactionId int64) (*VAST, error) {
 	log.Print("vastResponse.constructVast")
 	var vast = &VAST{}
 	if campaign.Id == 0 {
@@ -78,13 +85,13 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 					},
 					Errors: []CDATAString{
 						// TODO: update beacons with unique transaction ID for tracking purposes
-						{errorURI},
+						{appendTransactionIdToUri(errorURI, transactionId)},
 					},
 					Impressions: []Impression{
 						// In a real life scenario, the ImpressionId and URI would be dynamically generated for tracking purposes
 						{
 							ID:  impressionId,
-							URI: impressionURI,
+							URI: appendTransactionIdToUri(impressionURI, transactionId),
 						},
 					},
 					Creatives: []Creative{
@@ -98,11 +105,11 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 									// TODO: UPDATE TRACKING WITH REST OF QUARTILES
 									{
 										Event: trackingEventStart,
-										URI:   trackingEventStartURI,
+										URI:   appendTransactionIdToUri(trackingEventStartURI, transactionId),
 									},
 									{
 										Event: trackingEventComplete,
-										URI:   trackingEventCompleteURI,
+										URI:   appendTransactionIdToUri(trackingEventCompleteURI, transactionId),
 									},
 								},
 								VideoClicks: &VideoClicks{
