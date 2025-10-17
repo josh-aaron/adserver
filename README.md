@@ -17,39 +17,50 @@ Welcome to the README for the adserver project! Please also refer to the WORKLOG
 ### Core Requirements
 
 1. Clone adserver repo
+
 2. Download/install Postgres (if necessary)
    - If installing for the first time, ensure that you take note of the password and install path (you'll need the install path to set your psql command environment variable)
+
 3. Create a .env file in the main adserver directory (can copy .env.SAMPLE) and update with your Postgres username, password, and preferred port for the HTTP server.
+
 4. Create the adserver DB
-   First connect to the psql shell
+
+First, connect to the psql shell:
    ```
    psql -U {username}
    ```
-   And run this script:
+   Then run this script:
+
    ```
    \i scripts/init_db.sql
    ```
-5. Create the tables by running the following commands in the psql shell. 
+5. Create the tables by running the following commands in the psql shell:
   
    ```
    \c adserver
    \i scripts/create_all_tables.sql
    ```
-Note: I originally used migrations for the Campaign table - see ``migrate/migrations`` (using golang-migrate https://github.com/golang-migrate/migrate). However, I used simple SQL statements for subsequent tables.
+
+Note: I originally used migrations for the Campaign table - see ``migrate/migrations`` (using golang-migrate https://github.com/golang-migrate/migrate). However, to create the subsequent tables I just SQL in the psql shell.
 
 6. Build and run the executable:
    - On Mac,  run ```make run``` in the terminal
    - On Windows,  run ```make runWindows``` in the terminal
+
 7. Create some Campaign data and test the API endpoints!
    - Use the curl commands in curl-commands.txt to create some campaign data, or leverage an API testing tool like Postman or Thunderclient and snag the campaign JSON objects in curl-commands.txt
    - See the "API Documentation" section below for details
    - You can find market names mapped to DMA codes here: https://www.spstechnical.com/DMACodes.htm
+
 8. Test the other available Campaign API endpoints (GET by id, GET all, PUT, and DELETE)
+
 9. Use the ad response endpoint to retrieve a VAST response using GET requests
    - Ensure that: a. the ```dma``` parameter matches a targetDmaId from a Campaign you created, and b. the campaign is active in order to receive a populated VAST response
    - If a campaign with a matching dma is found, but the campaign is inactive, an empty VAST will be returned
    - You can check the console log to observe the total ad duration served. Once the limit of 300 seconds is reached, you can restart the server to request additional ads (or wait an hour!)
+
 10. Enter the VAST XML into an online VAST validator (e.g., https://tools.springserve.com/tagtest) and watch the ad play!
+
 11. Run ```make test``` to run the unit test(s)
 
 ### Bonus Requirements
@@ -61,6 +72,7 @@ Note: I originally used migrations for the Campaign table - see ``migrate/migrat
 
 Verification Steps:
 1. Ensure that at least one successful ad request has been sent to the VAST ad response API endpoint (i.e., endpoint returns either a populated VAST response or an empty VAST response with no ads due to inactive campaign)
+
 2. Query the ad_transaction table using your method of choice. Options include using the psql shell, or DB Administration application of choice. Here are the required psql commands, if that's your style:
 
 ```
@@ -76,9 +88,11 @@ SELECT * FROM ad_transction
 
 Verification Steps:
 1. After submitting an ad request and successfully receiving a VAST response, grab the transaction ID from the callback urls in the VAST, or check the console log (if receiving an empty VAST due to an inactive campaign, the transaction ID will only be available in the console log)
+
 2. Since we don't have a video player client to fire the callbacks (yet...), you can use a GET curl command or your API testing tool of choice to manually fire the callbacks
    - Use the transaction ID obtained in step 1 above for the ```t``` query parameter
    - Choose an event callback name (i.e., defaultImpression, error, start, fristQuartile, midPoint, thirdQuartile, complete). The endpoint currently does not have any validation and accepts any string
+   
 3. Query the ```ad_beacon``` table to see the logged event callback beacons:
 
 ```
