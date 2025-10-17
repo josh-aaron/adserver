@@ -30,6 +30,7 @@ type dbConfig struct {
 	maxIdleTime  string
 }
 
+// TODO: update routes with API verison, e.g., /v1/campaigns, /v1/ads
 func (app *application) mount() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", app.healthCheckHandler)

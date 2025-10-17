@@ -55,5 +55,7 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(vastXml)
 
+	// I thought it might be more performant to pass individual variables to LogAdTransaction, as opposed to
+	// instantiating a new AdTransaction struct. However, I should research if this goes against best practices
 	app.repository.AdTransaction.LogAdTransaction(ctx, transactionId, r.URL.String(), vastXml, dmaIdInt, campaign.Id)
 }

@@ -84,11 +84,10 @@ func constructVast(campaign *Campaign, transactionId int64) (*VAST, error) {
 						Value:    pricingValue,
 					},
 					Errors: []CDATAString{
-						// TODO: update beacons with unique transaction ID for tracking purposes
 						{appendTransactionIdToUri(errorURI, transactionId)},
 					},
 					Impressions: []Impression{
-						// In a real life scenario, the ImpressionId and URI would be dynamically generated for tracking purposes
+						// In a real life scenario, the ImpressionId and URI would be dynamically generated or retrieved from a DB
 						{
 							ID:  impressionId,
 							URI: appendTransactionIdToUri(impressionURI, transactionId),
@@ -155,11 +154,10 @@ func constructVast(campaign *Campaign, transactionId int64) (*VAST, error) {
 
 // TODO: Think about if this would make more sense to live elsewhere
 func checkIsCampaignActive(startDate string, endDate string) bool {
-	log.Println("vastResponse.checkIsCampaignActive()")
+	log.Printf("vastResponse.checkIsCampaignActive()")
 
 	// Convert startDate and endDate to timestamps
 	layout := "2006-01-02"
-
 	parsedStartDate, err := time.Parse(layout, startDate)
 	if err != nil {
 		fmt.Println("Error parsing date:", err)

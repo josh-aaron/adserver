@@ -56,6 +56,8 @@ func (r *CampaignRepo) GetAll(ctx context.Context) ([]Campaign, error) {
 		campaigns = append(campaigns, c)
 	}
 
+	log.Printf("campaign.GetAll() returning all campaigns: %v", campaigns)
+
 	return campaigns, nil
 }
 
@@ -75,7 +77,7 @@ func (r *CampaignRepo) Delete(ctx context.Context, campaignId int64) error {
 	if rows == 0 {
 		return errors.New("campaign not found")
 	}
-	log.Printf("campaign.Delete: successfully delete campaign with id %d", campaignId)
+	log.Printf("campaign.Delete: successfully deleted campaign id %d", campaignId)
 	return nil
 }
 
@@ -108,6 +110,8 @@ func (r *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 	if err != nil {
 		return err
 	}
+
+	log.Printf("campaign.Create() sucessfully created campaign: %v", campaign)
 
 	return nil
 }
@@ -147,6 +151,8 @@ func (r *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *C
 		}
 	}
 
+	log.Printf("campaign.Create() sucessfully updated campaign: %v", campaign)
+
 	return nil
 
 }
@@ -180,6 +186,8 @@ func (r *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign
 		}
 	}
 
+	log.Printf("campaign.GetById() returning campaign: %v", campaign)
+
 	return &campaign, nil
 }
 
@@ -206,6 +214,8 @@ func (r *CampaignRepo) GetByDma(ctx context.Context, campaignId int64) (*Campaig
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("campaign.GetByDma() returning campaign: %v", campaign)
 
 	return &campaign, nil
 }

@@ -269,7 +269,7 @@ DELETE /campaigns/7
 
 
 Success:
-- If the campaign exists and was deleted successfully, returns a 200 HTTP status code
+- Returns a 200 HTTP status code if the campaign exists and was deleted successfully
 
 
 Error:
