@@ -17,7 +17,7 @@ const pricingCurrency = "USD"
 const pricingValue = "25.00"
 const errorURI = "localhost:8080/beacons?cn=error&t="
 const impressionId = "Impression-ID-01"
-const impressionURI = "http://example.com/impression"
+const impressionURI = "localhost:8080/beacons?cn=defaultImpression&t="
 const sequence = 1
 const linearDuration = "00:00:15"
 const trackingEventStart = "start"

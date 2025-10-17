@@ -14,8 +14,7 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	// As soon as an ad request is allowed through by the rate limiter, create a transactionId
 	transactionId := app.repository.AdTransaction.CreateTransactionId()
 
-	queryParams := r.URL.Query()
-	dmaIdParam := queryParams.Get("dma")
+	dmaIdParam := app.ExtractQueryParam("dma", r.URL.Query())
 	dmaIdInt, err := strconv.ParseInt(dmaIdParam, 10, 64)
 	if err != nil {
 		log.Print(err)
@@ -57,5 +56,5 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(vastXml)
 
-	app.repository.AdTransaction.CreateAdTransaction(ctx, transactionId, r.URL.String(), vastXml, dmaIdInt, campaign.Id)
+	app.repository.AdTransaction.LogAdTransaction(ctx, transactionId, r.URL.String(), vastXml, dmaIdInt, campaign.Id)
 }

@@ -19,7 +19,8 @@ type Repository struct {
 	}
 	AdTransaction interface {
 		CreateTransactionId() int64
-		CreateAdTransaction(context.Context, int64, string, []byte, int64, int64)
+		LogAdTransaction(context.Context, int64, string, []byte, int64, int64)
+		LogBeacons(context.Context, int64, string, string) error
 	}
 }
 

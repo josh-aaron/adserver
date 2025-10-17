@@ -9,5 +9,6 @@ CREATE TABLE IF NOT EXISTS ad_transaction(
 CREATE TABLE IF NOT EXISTS ad_beacon(
     id bigserial PRIMARY KEY,
     transaction_id bigint NOT NULL REFERENCES ad_transaction (transaction_id),
-    beacon_url text NOT NULL
+    beacon_url text NOT NULL,
+    beacon_name text NOT NULL
 );

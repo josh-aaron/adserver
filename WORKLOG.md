@@ -11,4 +11,5 @@ Each commit is tied to one of the following:
 - [ADS-004] Implement ad request/response API
 - [ADS-005] Implement rate limiter
 - [ADS-006] Implement unit testing proof of concept
-- [ADS-007] Implement logging of ad requests and responses
+- [ADS-007] Implement logging of ad requests and responses to DB for future querying
+- [ADS-008] Implement logging of impression, error, and quartile beacons to DB for future querying

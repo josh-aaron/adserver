@@ -44,6 +44,10 @@ func (app *application) mount() http.Handler {
 	// Wrap the getVastHandler in the rateLimiter middleware
 	mux.Handle("GET /ads", app.rateLimiterMiddleware(http.HandlerFunc(app.getVastHandler)))
 
+	// Endpoint for client video players to send impression, error, and quartile beacons, using a transactionId.
+	// The transactionId will be unique to each ad request, and be dynmically appended to the beacon URIs in the VAST
+	mux.HandleFunc("GET /beacons", app.logBeaconsHandler)
+
 	return mux
 }
 
