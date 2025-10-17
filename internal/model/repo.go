@@ -15,14 +15,19 @@ type Repository struct {
 		GetByDma(context.Context, int64) (*Campaign, error)
 	}
 	VastResponse interface {
-		GetVast(context.Context, *Campaign, int) (*VAST, int, error)
+		GetVast(context.Context, *Campaign, int, int64) (*VAST, int, error)
+	}
+	AdTransaction interface {
+		CreateTransactionId() int64
+		CreateAdTransaction(context.Context, int64, string, []byte, int64, int64)
 	}
 }
 
 func NewRepository(db *sql.DB) Repository {
 	return Repository{
-		Campaign:     &CampaignRepo{db},
-		VastResponse: &VastResponseRepo{db},
+		Campaign:      &CampaignRepo{db},
+		VastResponse:  &VastResponseRepo{db},
+		AdTransaction: &AdTransactionRepo{db},
 	}
 
 }

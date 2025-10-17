@@ -25,12 +25,12 @@ type CampaignRepo struct {
 	db *sql.DB
 }
 
-func (s *CampaignRepo) GetAll(ctx context.Context) ([]Campaign, error) {
+func (r *CampaignRepo) GetAll(ctx context.Context) ([]Campaign, error) {
 	log.Println("campaign.GetAll()")
 	query := `SELECT * FROM campaign`
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
-	rows, err := s.db.QueryContext(ctx, query)
+	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +59,12 @@ func (s *CampaignRepo) GetAll(ctx context.Context) ([]Campaign, error) {
 	return campaigns, nil
 }
 
-func (s *CampaignRepo) Delete(ctx context.Context, campaignId int64) error {
+func (r *CampaignRepo) Delete(ctx context.Context, campaignId int64) error {
 	log.Println("campaign.Delete()")
 	query := `DELETE FROM campaign WHERE id = $1`
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
-	result, err := s.db.ExecContext(ctx, query, campaignId)
+	result, err := r.db.ExecContext(ctx, query, campaignId)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (s *CampaignRepo) Delete(ctx context.Context, campaignId int64) error {
 	return nil
 }
 
-func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
+func (r *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 	log.Println("campaign.Create()")
 	query := `
 	INSERT INTO campaign (name, start_date, end_date, target_dma_id, ad_id, ad_name, ad_duration, ad_creative_id, ad_creative_url)
@@ -90,7 +90,7 @@ func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 
-	err := s.db.QueryRowContext(
+	err := r.db.QueryRowContext(
 		ctx,
 		query,
 		campaign.Name,
@@ -112,7 +112,7 @@ func (s *CampaignRepo) Create(ctx context.Context, campaign *Campaign) error {
 	return nil
 }
 
-func (s *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *Campaign) error {
+func (r *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *Campaign) error {
 	log.Println("campaign.Update()")
 	query := `
 		UPDATE campaign
@@ -123,7 +123,7 @@ func (s *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *C
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 
-	err := s.db.QueryRowContext(
+	err := r.db.QueryRowContext(
 		ctx,
 		query,
 		campaign.Name,
@@ -151,7 +151,7 @@ func (s *CampaignRepo) Update(ctx context.Context, campaignId int64, campaign *C
 
 }
 
-func (s *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign, error) {
+func (r *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign, error) {
 	log.Println("campaign.GetById()")
 
 	query := `SELECT * FROM campaign WHERE id = $1`
@@ -159,7 +159,7 @@ func (s *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign
 	defer cancel()
 
 	var campaign Campaign
-	err := s.db.QueryRowContext(ctx, query, campaignId).Scan(
+	err := r.db.QueryRowContext(ctx, query, campaignId).Scan(
 		&campaign.Id,
 		&campaign.Name,
 		&campaign.StartDate,
@@ -183,14 +183,14 @@ func (s *CampaignRepo) GetById(ctx context.Context, campaignId int64) (*Campaign
 	return &campaign, nil
 }
 
-func (s *CampaignRepo) GetByDma(ctx context.Context, campaignId int64) (*Campaign, error) {
+func (r *CampaignRepo) GetByDma(ctx context.Context, campaignId int64) (*Campaign, error) {
 	log.Println("campaign.GetByDma()")
 	query := `SELECT * FROM campaign WHERE target_dma_id = $1`
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
 
 	var campaign Campaign
-	err := s.db.QueryRowContext(ctx, query, campaignId).Scan(
+	err := r.db.QueryRowContext(ctx, query, campaignId).Scan(
 		&campaign.Id,
 		&campaign.Name,
 		&campaign.StartDate,

@@ -11,6 +11,9 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	println("getVastHandler()")
 	w.Header().Set("Content-Type", "application/xml")
 
+	// As soon as an ad request is allowed through by the rate limiter, create a transactionId
+	transactionId := app.repository.AdTransaction.CreateTransactionId()
+
 	queryParams := r.URL.Query()
 	dmaIdParam := queryParams.Get("dma")
 	dmaIdInt, err := strconv.ParseInt(dmaIdParam, 10, 64)
@@ -35,7 +38,8 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	// into it's ad selection process, to ensure it's not breaching the limit. So, let's pass the currentDurationServed to the VAST response service.
 	ip := app.getIpHost(r.RemoteAddr)
 	currentDurationServed := app.rateLimiter.GetCurrentAdDurationServed(ip)
-	vast, vastDuration, err := app.repository.VastResponse.GetVast(ctx, campaign, currentDurationServed)
+
+	vast, vastDuration, err := app.repository.VastResponse.GetVast(ctx, campaign, currentDurationServed, transactionId)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -50,5 +54,8 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 	w.Write(vastXml)
+
+	app.repository.AdTransaction.CreateAdTransaction(ctx, transactionId, r.URL.String(), vastXml, dmaIdInt, campaign.Id)
 }

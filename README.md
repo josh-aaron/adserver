@@ -251,8 +251,6 @@ Error:
 - Returns a 500 HTTP error code for all other issues
 
 
-
-
 ## Assumptions and Limitations
 
 

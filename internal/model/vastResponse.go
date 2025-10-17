@@ -12,21 +12,17 @@ type VastResponseRepo struct {
 	db *sql.DB
 }
 
-func (s *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, totalDuration int) (*VAST, int, error) {
+func (r *VastResponseRepo) GetVast(ctx context.Context, campaign *Campaign, totalDuration int, transactionId int64) (*VAST, int, error) {
 	log.Println("vastResponse.GetVast()")
 
-	isCampaignActive, err := checkIsCampaignActive(campaign.StartDate, campaign.EndDate)
-	if err != nil {
-		// TODO: return custom error message
-		return nil, 0, err
-	}
+	isCampaignActive := checkIsCampaignActive(campaign.StartDate, campaign.EndDate)
 
 	// Check if the campaign is active or inactive. If inactive, let's return an emtpy VAST response
-	var vast *VAST
 	if !isCampaignActive {
 		campaign = &Campaign{}
 	}
-	vast, err = constructVast(campaign)
+	// TODO: implement logic that will append the transactionId to the impression url and trackingEvent urls
+	vast, err := constructVast(campaign)
 	if err != nil {
 		log.Println(err)
 		return nil, 0, err
@@ -151,7 +147,7 @@ func constructVast(campaign *Campaign) (*VAST, error) {
 }
 
 // TODO: Think about if this would make more sense to live elsewhere
-func checkIsCampaignActive(startDate string, endDate string) (bool, error) {
+func checkIsCampaignActive(startDate string, endDate string) bool {
 	log.Println("vastResponse.checkIsCampaignActive()")
 
 	// Convert startDate and endDate to timestamps
@@ -160,25 +156,25 @@ func checkIsCampaignActive(startDate string, endDate string) (bool, error) {
 	parsedStartDate, err := time.Parse(layout, startDate)
 	if err != nil {
 		fmt.Println("Error parsing date:", err)
-		return false, err
+		return false
 	}
 	parsedEndDate, err := time.Parse(layout, endDate)
 	if err != nil {
 		fmt.Println("Error parsing date:", err)
-		return false, err
+		return false
 	}
 
 	currentDate := time.Now()
 
 	if currentDate.Compare(parsedStartDate) == -1 {
 		log.Println("Campaign is not yet active")
-		return false, nil
+		return false
 	}
 
 	if currentDate.Compare(parsedEndDate) == 0 || currentDate.Compare(parsedEndDate) == 1 {
 		log.Println("Campaign has expired")
-		return false, nil
+		return false
 	}
 
-	return true, nil
+	return true
 }
