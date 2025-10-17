@@ -59,7 +59,8 @@ Note: I originally used migrations for the Campaign table - see ``migrate/migrat
    - If a campaign with a matching dma is found, but the campaign is inactive, an empty VAST will be returned
    - You can check the console log to observe the total ad duration served. Once the limit of 300 seconds is reached, you can restart the server to request additional ads (or wait an hour!)
 
-10. Enter the VAST XML into an online VAST validator (e.g., https://tools.springserve.com/tagtest) and watch the ad play!
+10. Enter the VAST XML into an online VAST validator (e.g., https://googleads.github.io/googleads-ima-html5/vsi/) and watch the ad play!
+   - If you open up the browser console log and/or network tab, you can see the callback urls from the VAST firing
 
 11. Run ```make test``` to run the unit test(s)
 
@@ -92,7 +93,7 @@ Verification Steps:
 2. Since we don't have a video player client to fire the callbacks (yet...), you can use a GET curl command or your API testing tool of choice to manually fire the callbacks
    - Use the transaction ID obtained in step 1 above for the ```t``` query parameter
    - Choose an event callback name (i.e., defaultImpression, error, start, fristQuartile, midPoint, thirdQuartile, complete). The endpoint currently does not have any validation and accepts any string
-   
+
 3. Query the ```ad_beacon``` table to see the logged event callback beacons:
 
 ```
