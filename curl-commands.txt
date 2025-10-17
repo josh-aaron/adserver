@@ -6,6 +6,8 @@ curl -X GET localhost:8080/campaigns/{id}
 
 curl -X GET localhost:8080/ads?dma=501
 
+curl -X Get localhost:8080/beacons?cn={callbackName}&t={transactionId}
+
 #### POST ####
 
 curl -X POST -H "Content-Type: application/json" -d '{
