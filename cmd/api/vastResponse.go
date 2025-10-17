@@ -37,14 +37,13 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	// into it's ad selection process, to ensure it's not breaching the limit. So, let's pass the currentDurationServed to the VAST response service.
 	ip := app.getIpHost(r.RemoteAddr)
 	currentDurationServed := app.rateLimiter.GetCurrentAdDurationServed(ip)
-
 	vast, vastDuration, err := app.repository.VastResponse.GetVast(ctx, campaign, currentDurationServed, transactionId)
 	if err != nil {
 		log.Print(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	// Update the current ad duration served with the total duration in the latest vast response
+	// Update the current ad duration served in our in-memory cache with the total duration in the latest vast response
 	app.rateLimiter.UpdateCurrentAdDurationServed(ip, vastDuration)
 
 	// Marshal the VAST struct into xml to be written to the response
