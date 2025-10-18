@@ -44,10 +44,10 @@ func calculateTotalDuration(vast *VAST) int {
 	return 15
 }
 
-func appendTransactionIdToUri(uri string, transactionId int64) string {
-	log.Printf("appendTransactionIdToUri, appending %v to %v", transactionId, uri)
+func constructCallbackUrl(callbackName string, transactionId int64) string {
+	log.Printf("appendTransactionIdToUri, appending %v to %v%v", transactionId, callbackUrlHost, callbackName)
 	transactionIdStr := strconv.FormatInt(transactionId, 10)
-	return uri + transactionIdStr
+	return callbackUrlHost + "beacons?cn=" + callbackName + "t=" + transactionIdStr
 }
 
 // TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
@@ -84,13 +84,13 @@ func constructVast(campaign *Campaign, transactionId int64) (*VAST, error) {
 						Value:    pricingValue,
 					},
 					Errors: []CDATAString{
-						{appendTransactionIdToUri(errorURI, transactionId)},
+						{constructCallbackUrl("error", transactionId)},
 					},
 					Impressions: []Impression{
 						// In a real life scenario, the ImpressionId and URI would be dynamically generated or retrieved from a DB
 						{
 							ID:  impressionId,
-							URI: appendTransactionIdToUri(impressionURI, transactionId),
+							URI: constructCallbackUrl("defaultImpression", transactionId),
 						},
 					},
 					Creatives: []Creative{
@@ -104,11 +104,11 @@ func constructVast(campaign *Campaign, transactionId int64) (*VAST, error) {
 									// TODO: UPDATE TRACKING WITH REST OF QUARTILES
 									{
 										Event: trackingEventStart,
-										URI:   appendTransactionIdToUri(trackingEventStartURI, transactionId),
+										URI:   constructCallbackUrl("start", transactionId),
 									},
 									{
 										Event: trackingEventComplete,
-										URI:   appendTransactionIdToUri(trackingEventCompleteURI, transactionId),
+										URI:   constructCallbackUrl("complete", transactionId),
 									},
 								},
 								VideoClicks: &VideoClicks{

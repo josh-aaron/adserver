@@ -1,10 +1,22 @@
 package model
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/josh-aaron/adserver/internal/env"
+)
 
 var (
 	ErrNotFound = errors.New("resource not found")
 )
+
+var callbackUrlHost string
+
+func init() {
+	env.LoadEnv()
+	callbackUrlHost = env.GetCallbackUrlHost()
+
+}
 
 // The following consts comprise the hardcoded data for the VAST response.
 // The const names camelcase since they are not exported outside the model package.

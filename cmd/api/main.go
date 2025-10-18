@@ -20,7 +20,7 @@ func main() {
 		addr: env.GetString("PORT", ":8080"),
 		// TODO: update all other config fields to be ENV variables, or constants
 		db: dbConfig{
-			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/adserver?sslmode=disable"),
+			addr:         env.GetDBAddr(),
 			maxOpenConns: 30,
 			maxIdleConns: 30,
 			maxIdleTime:  "15m",
