@@ -43,6 +43,6 @@ func GetDBAddr() string {
 	} else {
 		res, _ = os.LookupEnv("DEV_DB_ADDR")
 	}
-	log.Printf("GetCallbackUrlHost() ENV: %v, using %v", val, res)
+	log.Printf("GetDBAddr() ENV: %v, using %v", val, res)
 	return res
 }
