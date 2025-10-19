@@ -49,7 +49,7 @@ func (app *application) mount() http.Handler {
 	// The transactionId will be unique to each ad request, and be dynmically appended to the beacon URIs in the VAST
 	mux.HandleFunc("GET /beacons", app.logBeaconsHandler)
 
-	mux.HandleFunc("GET /adTransactions", app.getAdTransactionsHandler)
+	mux.HandleFunc("GET /adtransactions", app.getAdTransactionsHandler)
 
 	return mux
 }
