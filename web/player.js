@@ -1,12 +1,19 @@
 const videoElement = document.getElementById("videoElement");
-const contentVideoSrc = videoElement.getAttribute("src");
+const contentVideoSrc = videoElement.currentSrc
 const playButton = document.getElementById("playButton");
 const dmaTextArea = document.getElementById("dmaTextArea")
 
 playButton.addEventListener("click", () => {
 	start();
-	console.log("after start()")
 });
+
+videoElement.addEventListener("ended", (event) => {
+	console.log("ended")
+	if (event.target.currentSrc != contentVideoSrc) {
+		videoElement.setAttribute("src", contentVideoSrc)
+		videoElement.play()
+	}
+})
 
 function start() {
 	submitAdRequest()
@@ -33,7 +40,6 @@ function getMediaFile(vastXml) {
 	const adSrc = mediaFileNodes[0].textContent
 	return adSrc
 }
-
 
 async function submitAdRequest() {
 	console.log("submitAdRequest")
