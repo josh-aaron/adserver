@@ -32,7 +32,7 @@ func TestGetCampaign(t *testing.T) {
 			TargetDmaId:   501,
 			AdId:          2,
 			AdName:        "ForBiggerEscapes",
-			AdDuration:    15,
+			AdDuration:    1,
 			AdCreativeId:  102,
 			AdCreativeUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
 		}
