@@ -21,6 +21,7 @@ type Repository struct {
 		CreateTransactionId() int64
 		LogAdTransaction(context.Context, int64, string, []byte, int64, int64)
 		LogBeacons(context.Context, int64, string, string) error
+		GetAllAdTransactions(context.Context) ([]AdTransaction, error)
 	}
 }
 

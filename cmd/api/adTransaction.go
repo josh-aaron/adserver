@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -28,4 +29,20 @@ func (app *application) logBeaconsHandler(w http.ResponseWriter, r *http.Request
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+func (app *application) getAdTransactionsHandler(w http.ResponseWriter, r *http.Request) {
+	println("getAdTransactions")
+	w.Header().Set("Content-Type", "application/json")
+
+	ctx := r.Context()
+	adTransactions, err := app.repository.AdTransaction.GetAllAdTransactions(ctx)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(adTransactions)
 }

@@ -7,11 +7,10 @@ import (
 	"time"
 )
 
-// Currently unused - in the future we may need to modify an AdTransaction based on business logic
 type AdTransaction struct {
 	TransactionId int64
+	AdRequest     string
 	VastResponse  string
-	AdResponse    []byte
 	ClientDmaId   int64
 	CampaignId    int64
 }
@@ -73,4 +72,34 @@ func (r *AdTransactionRepo) LogBeacons(ctx context.Context, transactionId int64,
 	}
 
 	return nil
+}
+
+func (r *AdTransactionRepo) GetAllAdTransactions(ctx context.Context) ([]AdTransaction, error) {
+	log.Println("AdTransactionRepo.GetAllAdTransactions()")
+	query := `SELECT transaction_id, ad_request, vast_response, client_dma_id, campaign_id FROM ad_transaction`
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var adTransactions []AdTransaction
+	for rows.Next() {
+		var at AdTransaction
+		err := rows.Scan(
+			&at.TransactionId,
+			&at.AdRequest,
+			&at.VastResponse,
+			&at.ClientDmaId,
+			&at.CampaignId,
+		)
+		if err != nil {
+			return nil, err
+		}
+		adTransactions = append(adTransactions, at)
+	}
+
+	log.Printf("AdTransactionRepo.GetAllAdTransactions() returning %v adTransactions", len(adTransactions))
+	return adTransactions, nil
 }
