@@ -1,4 +1,4 @@
-name: test
+name: Run Render CI/CD
 
 on:
   push:
