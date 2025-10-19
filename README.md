@@ -334,7 +334,7 @@ Error:
 ## Assumptions and Limitations
 
 
-- Only one publisher network (e.g., BobsAwesomeCatVideos.com is our only ad space publisher). Therefore, when any ad request is received, we only filter by targetDma and by if the campaign is active
+- Only one publisher network (e.g., BobsAwesomeCowVideos.com is our only ad space publisher). Therefore, when any ad request is received, we only filter by targetDma and by if the campaign is active
 - DMA code/id will be hardcoded into the ad request
 - Ad and Creative data will live in the Campaign table. This is for ease of testing and updating the exposed Campaign API endpoints - i.e., testers can add/modify campaigns and see those changes reflected in the VAST response
    - All other VAST data will be hardcoded

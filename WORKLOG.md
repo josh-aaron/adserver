@@ -15,3 +15,4 @@ Each commit is tied to one of the following:
 - [ADS-008] Implement logging of impression, error, and quartile beacons to DB for future querying
 - [ADS-009] Deploy web server to cloud
 - [ADS-010] Expose endpoints to query adtransactions and beacons
+- [ADS-011] Implement client video player that submits ad request, plays ad, and sends beacons

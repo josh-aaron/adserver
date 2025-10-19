@@ -33,6 +33,10 @@ type dbConfig struct {
 // TODO: update routes with API verison, e.g., /v1/campaigns, /v1/ads
 func (app *application) mount() http.Handler {
 	mux := http.NewServeMux()
+
+	fileserver := http.FileServer(http.Dir("./web/"))
+	mux.Handle("/web/", http.StripPrefix("/web/", fileserver))
+
 	mux.HandleFunc("GET /health", app.healthCheckHandler)
 
 	mux.HandleFunc("GET /campaigns", app.getCampaignsHandler)
