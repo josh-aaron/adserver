@@ -1,6 +1,7 @@
 const videoElement = document.getElementById("videoElement");
 const contentVideoSrc = videoElement.getAttribute("src");
 const playButton = document.getElementById("playButton");
+const dmaTextArea = document.getElementById("dmaTextArea")
 
 playButton.addEventListener("click", () => {
 	start();
@@ -37,8 +38,9 @@ function getMediaFile(vastXml) {
 async function submitAdRequest() {
 	console.log("submitAdRequest")
 	try {
-		const response = await fetch("/ads?dma=501");
-
+		const dma = dmaTextArea.value
+		const adRequestPath = "/ads?dma=" + dma
+		const response = await fetch(adRequestPath);
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
