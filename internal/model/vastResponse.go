@@ -47,7 +47,7 @@ func calculateTotalDuration(vast *VAST) int {
 func constructCallbackUrl(callbackName string, transactionId int64) string {
 	log.Printf("appendTransactionIdToUri, appending %v to %v%v", transactionId, callbackUrlHost, callbackName)
 	transactionIdStr := strconv.FormatInt(transactionId, 10)
-	return callbackUrlHost + "beacons?cn=" + callbackName + "t=" + transactionIdStr
+	return callbackUrlHost + "beacons?cn=" + callbackName + "&t=" + transactionIdStr
 }
 
 // TODO: Based on the rate limiting requirements, we would need to use the current ad duration served as part of the
