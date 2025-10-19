@@ -32,7 +32,7 @@ func (app *application) logBeaconsHandler(w http.ResponseWriter, r *http.Request
 }
 
 func (app *application) getAdTransactionsHandler(w http.ResponseWriter, r *http.Request) {
-	println("getAdTransactions")
+	println("getAdTransactionsHandler()")
 	w.Header().Set("Content-Type", "application/json")
 
 	ctx := r.Context()
@@ -45,4 +45,28 @@ func (app *application) getAdTransactionsHandler(w http.ResponseWriter, r *http.
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(adTransactions)
+}
+
+func (app *application) getBeaconsByTransactionIdHandler(w http.ResponseWriter, r *http.Request) {
+	println("getBeaconsLogHandler()")
+	w.Header().Set("Content-Type", "application/json")
+
+	transactionIdParam := r.PathValue("transactionId")
+	transactionIdInt, err := strconv.ParseInt(transactionIdParam, 10, 64)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	ctx := r.Context()
+	beacons, err := app.repository.AdTransaction.GetBeaconsByTransactionId(ctx, transactionIdInt)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(beacons)
 }

@@ -48,6 +48,7 @@ func (app *application) mount() http.Handler {
 	// Endpoint for client video players to send impression, error, and quartile beacons, using a transactionId.
 	// The transactionId will be unique to each ad request, and be dynmically appended to the beacon URIs in the VAST
 	mux.HandleFunc("GET /beacons", app.logBeaconsHandler)
+	mux.HandleFunc("GET /beaconslog/{transactionId}", app.getBeaconsByTransactionIdHandler)
 
 	mux.HandleFunc("GET /adtransactions", app.getAdTransactionsHandler)
 

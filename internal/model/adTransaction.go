@@ -15,6 +15,13 @@ type AdTransaction struct {
 	CampaignId    int64
 }
 
+type AdBeacon struct {
+	Id            int64
+	TransactionId int64
+	BeaconUrl     string
+	BeaconName    string
+}
+
 type AdTransactionRepo struct {
 	db *sql.DB
 }
@@ -76,14 +83,17 @@ func (r *AdTransactionRepo) LogBeacons(ctx context.Context, transactionId int64,
 
 func (r *AdTransactionRepo) GetAllAdTransactions(ctx context.Context) ([]AdTransaction, error) {
 	log.Println("AdTransactionRepo.GetAllAdTransactions()")
+
 	query := `SELECT transaction_id, ad_request, vast_response, client_dma_id, campaign_id FROM ad_transaction`
 	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
+
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
+
 	var adTransactions []AdTransaction
 	for rows.Next() {
 		var at AdTransaction
@@ -102,4 +112,44 @@ func (r *AdTransactionRepo) GetAllAdTransactions(ctx context.Context) ([]AdTrans
 
 	log.Printf("AdTransactionRepo.GetAllAdTransactions() returning %v adTransactions", len(adTransactions))
 	return adTransactions, nil
+}
+
+func (r *AdTransactionRepo) GetBeaconsByTransactionId(ctx context.Context, transactionId int64) ([]AdBeacon, error) {
+	log.Printf("AdTransactionRepo.GetBeaconsByTransactionId() for transactionId %v", transactionId)
+
+	query := `
+	SELECT id, transaction_id, beacon_url, beacon_name 
+	FROM ad_beacon 
+	WHERE transaction_id = $1
+	`
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*5)
+	defer cancel()
+
+	rows, err := r.db.QueryContext(ctx, query, transactionId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var beacons []AdBeacon
+	for rows.Next() {
+		var ab AdBeacon
+		err := rows.Scan(
+			&ab.Id,
+			&ab.TransactionId,
+			&ab.BeaconUrl,
+			&ab.BeaconName,
+		)
+		if err != nil {
+			return nil, err
+		}
+		beacons = append(beacons, ab)
+	}
+	if len(beacons) == 0 {
+		return nil, ErrNotFound
+	}
+
+	log.Printf("AdTransactionRepo.GetBeaconsByTransactionId() returning beacons: %v", beacons)
+	return beacons, nil
 }
