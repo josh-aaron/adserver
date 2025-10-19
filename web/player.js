@@ -3,6 +3,8 @@ const contentVideoSrc = videoElement.currentSrc
 const playButton = document.getElementById("playButton");
 const dmaTextArea = document.getElementById("dmaTextArea")
 
+let defaultImpression = ""
+
 playButton.addEventListener("click", () => {
 	start();
 });
@@ -15,16 +17,48 @@ videoElement.addEventListener("ended", (event) => {
 	}
 })
 
+// Per IAB MRC guidelines, default ad impression should fire as soon as ad renders
+videoElement.addEventListener("loadeddata", (event) => {
+	console.log("loaded")
+	if (event.target.currentSrc != contentVideoSrc) {
+		fireEventCallbackUrl(defaultImpression)
+	}
+})
+
+async function fireEventCallbackUrl(urlString) {
+	console.log("fireEventCallbackUrl firing " + urlString)
+	const urlObject = new URL(urlString)
+	const urlSearch = "/beacons" + urlObject.search
+	console.log(urlSearch)
+	const response = await fetch(urlSearch)
+	if (!response.ok) {
+		throw new Error(`HTTP error! status: ${response.status}`);
+	} 
+} 
+
 function start() {
 	submitAdRequest()
 	.then(vastXml => getMediaFile(vastXml))
 	.then(adSrc => updateVideoElementSrc(adSrc))
+	.catch(error => {console.error("An error occurred:", error)})
 	.finally(playAdVideo)
 }
 
 function playAdVideo(){
 	console.log("playAdVideo")
 	videoElement.play();
+}
+
+function getEventCallbacks(vastXml) {
+	console.log("getEventCallbacks")
+	getDefaultImpression(vastXml)
+}
+
+function getDefaultImpression(vastXml) {
+	console.log("getDefaultImpression")
+	const impressionNodes = vastXml.getElementsByTagName("Impression");
+	const impressionUrl = impressionNodes[0].textContent
+	defaultImpression = impressionUrl
 }
 
 function updateVideoElementSrc(adSrc) {
@@ -52,6 +86,7 @@ async function submitAdRequest() {
 		}
 		const data = await response.text()
 		xml = parseXmlString(data)
+		getEventCallbacks(xml)
 		return xml
 	} catch (error) {
 		console.error("Error fetching data:", error);
