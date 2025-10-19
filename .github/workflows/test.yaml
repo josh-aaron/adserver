@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  audit:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout 
@@ -36,9 +36,9 @@ jobs:
       - name: Run Tests
         run: go test -race ./...
 
-deploy:
-        needs: ci # Ensure CI job passes before deploying
-        runs-on: ubuntu-latest
-        steps:
-          - name: Trigger Render Deploy
-            run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+  deploy:
+          needs: test # Ensure CI job passes before deploying
+          runs-on: ubuntu-latest
+          steps:
+            - name: Trigger Render Deploy
+              run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
