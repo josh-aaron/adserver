@@ -107,6 +107,18 @@ func constructVast(campaign *Campaign, transactionId int64) (*VAST, error) {
 										URI:   constructCallbackUrl("start", transactionId),
 									},
 									{
+										Event: trackingEventFirstQuartile,
+										URI:   constructCallbackUrl("firstQuartile", transactionId),
+									},
+									{
+										Event: trackingEventMidpoint,
+										URI:   constructCallbackUrl("midpoint", transactionId),
+									},
+									{
+										Event: trackingEventThirdQuartile,
+										URI:   constructCallbackUrl("thirdQuartile", transactionId),
+									},
+									{
 										Event: trackingEventComplete,
 										URI:   constructCallbackUrl("complete", transactionId),
 									},
