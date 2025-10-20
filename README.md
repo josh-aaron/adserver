@@ -74,7 +74,9 @@ Note: I originally used migrations for the Campaign table - see ``migrate/migrat
 Verification Steps:
 1. Ensure that at least one successful ad request has been sent to the VAST ad response API endpoint (i.e., endpoint returns either a populated VAST response or an empty VAST response with no ads due to inactive campaign)
 
-2. Query the ad_transaction table using your method of choice. Options include using the psql shell, or DB Administration application of choice. Here are the required psql commands, if that's your style:
+2. Send a GET request to the /adtransactions endpoint.
+
+ Or query the ad_transaction table using your method of choice. Options include using the psql shell, or DB Administration application of choice. Here are the required psql commands, if that's your style:
 
 ```
 psql -U {username}
@@ -90,11 +92,11 @@ SELECT * FROM ad_transction
 Verification Steps:
 1. After submitting an ad request and successfully receiving a VAST response, grab the transaction ID from the callback urls in the VAST, or check the console log (if receiving an empty VAST due to an inactive campaign, the transaction ID will only be available in the console log)
 
-2. Since we don't have a video player client to fire the callbacks (yet...), you can use a GET curl command or your API testing tool of choice to manually fire the callbacks
+2. Skip to the next section to use the client video player to send beacons. Or, you can use a GET curl command or your API testing tool of choice to manually fire the callbacks
    - Use the transaction ID obtained in step 1 above for the ```t``` query parameter
    - Choose an event callback name (i.e., defaultImpression, error, start, fristQuartile, midPoint, thirdQuartile, complete). The endpoint currently does not have any validation and accepts any string
 
-3. Query the ```ad_beacon``` table to see the logged event callback beacons:
+3. Send a GET request to the /beaconslog/{transactionId} endpoint to see all of the beacons for that transactionid. Or, query the ```ad_beacon``` table to see the logged event callback beacons:
 
 ```
 psql -U {username}
@@ -103,6 +105,23 @@ SELECT * FROM ad_beacon
 ```
 
 4. See the API Documentation section below for additional details
+
+#### Client Video Player (Request ad, parse VAST, play ad, fire callback, and resume content video)
+
+1. Use the client video player to request an ad, play it back, and send event call backs! In your browser, navigate to the /web/ path (e.g., http://localhost:8080/web/). 
+
+2. In the text field, enter the DMA code from a campaign that you've created that's active (you can send a GET request to the /campaigns endpoint to reference the onces you've created), and press play.
+
+3. Enjoy your seamless and rich preroll ad experience (also open up the console log for some fun logging)
+
+4. Upon completion of the ad video, the content video will automatically resume (I hope you like cows)
+
+5. In the console log you'll find the transactionId from your ad viewing session. Send a GET request to the /beaconslog/{transactionId} endpoint to see all of the beacons recorded by the server for that transaction! 
+
+
+#### Host Application on the Cloud
+
+Test the API endpoints and client video player as described in the steps above... but in Prod! Since the cloud hosted app has no authentication currently, I will share the link via email instead of posting here.
 
 ## API Documentation
 
@@ -138,7 +157,7 @@ Error:
 
 
 ```
-GET /campaigns/
+GET /campaigns
 ```
 
 
@@ -305,6 +324,21 @@ Error:
 - Returns a 500 HTTP error code for all other issues
 
 
+### Ad Transaction API
+
+#### Get All Ad Transactions
+
+```
+GET /adtransactions
+```
+
+
+Success:
+- Returns a 200 HTTP status code and a list of JSON objects of all ad transactions in the response body
+
+
+Error
+- Returns a 500 HTTP error code If there was any error retrieving all ad transactions
 ### Ad Impression Log API
 
 #### Log Event callback
@@ -321,6 +355,28 @@ Url must contain query parameters for:
 Example:
 ```
 GET /beacons?cn=defaultImpression&t=1760668810092
+```
+
+Success:
+- Returns a 200 HTTP status code
+
+
+Error:
+- Returns a 400 HTTP error code if the transactionId is not an integer
+- Returns a 500 HTTP error code for all other issues
+
+
+#### Get Event callbacks by Transactionid
+
+```
+GET /beaconslog/{transactionId}
+```
+Url must contain a transactionId, as an int.
+
+
+Example:
+```
+GET /beaconslog/1760668810092
 ```
 
 Success:
