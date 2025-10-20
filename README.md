@@ -14,6 +14,9 @@ Welcome to the README for the adserver project! Please also refer to the WORKLOG
 
 ## Project Setup & Verification Steps
 
+- Follow steps 1 - 6 below to build the app locally
+- Or, if you prefer to test on the cloud hosted app, please obtain the link that was email on Oct 20th, and skip to step 7.
+
 ### Core Requirements
 
 1. Clone adserver repo
@@ -90,6 +93,7 @@ SELECT * FROM ad_transction
 - This endpoint extracts the transaction ID and callback name from the query parameters, and logs them to the DB along with the full beacon url
 
 Verification Steps:
+
 1. After submitting an ad request and successfully receiving a VAST response, grab the transaction ID from the callback urls in the VAST, or check the console log (if receiving an empty VAST due to an inactive campaign, the transaction ID will only be available in the console log)
 
 2. Skip to the next section to use the client video player to send beacons. Or, you can use a GET curl command or your API testing tool of choice to manually fire the callbacks
