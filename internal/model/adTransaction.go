@@ -30,6 +30,8 @@ func (r *AdTransactionRepo) CreateTransactionId() int64 {
 	return time.Now().UnixMilli()
 }
 
+// This method is not exposed to the user, and is only required internally. Therefore, I don't think we need to return an error back to the handler
+// to then send as HTTP error, we can simply log it to the console.
 func (r *AdTransactionRepo) LogAdTransaction(ctx context.Context, transactionId int64, adrequest string, vastXml []byte, clientDmaId int64, campaignId int64) {
 	log.Printf("adTransaction.LogAdTransaction() for transactionID: %v", transactionId)
 
@@ -56,6 +58,8 @@ func (r *AdTransactionRepo) LogAdTransaction(ctx context.Context, transactionId 
 	}
 }
 
+// Since sucessfully firing/recording beacons is a critical part of ad measurement and therefore billing, we should let the client know
+// if there are issues recording the bacons via an HTTP error
 func (r *AdTransactionRepo) LogBeacon(ctx context.Context, transactionId int64, beaconUri string, beaconName string) error {
 	log.Printf("adTransaction.LogBeacon() logging %v for transactionID: %v", beaconName, transactionId)
 	query := `

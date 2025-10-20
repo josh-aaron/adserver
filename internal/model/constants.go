@@ -6,9 +6,7 @@ import (
 	"github.com/josh-aaron/adserver/internal/env"
 )
 
-var (
-	ErrNotFound = errors.New("resource not found")
-)
+var ErrNotFound = errors.New("resource not found")
 
 var callbackUrlHost string
 

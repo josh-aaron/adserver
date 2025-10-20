@@ -34,6 +34,7 @@ type dbConfig struct {
 func (app *application) mount() http.Handler {
 	mux := http.NewServeMux()
 
+	// Provides the routing to the client video player
 	fileserver := http.FileServer(http.Dir("./web/"))
 	mux.Handle("/web/", http.StripPrefix("/web/", fileserver))
 

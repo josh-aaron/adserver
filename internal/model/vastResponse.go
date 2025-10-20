@@ -101,7 +101,6 @@ func constructVast(campaign *Campaign, transactionId int64) (*VAST, error) {
 								// TODO: UPDATE COLUMN TO BE EXPRESSED AS STRING IN THE FORMAT BELOW
 								Duration: linearDuration,
 								TrackingEvents: []Tracking{
-									// TODO: UPDATE TRACKING WITH REST OF QUARTILES
 									{
 										Event: trackingEventStart,
 										URI:   constructCallbackUrl("start", transactionId),
