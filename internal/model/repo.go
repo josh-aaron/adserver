@@ -20,7 +20,7 @@ type Repository struct {
 	AdTransaction interface {
 		CreateTransactionId() int64
 		LogAdTransaction(context.Context, int64, string, []byte, int64, int64)
-		LogBeacons(context.Context, int64, string, string) error
+		LogBeacon(context.Context, int64, string, string) error
 		GetAllAdTransactions(context.Context) ([]AdTransaction, error)
 		GetBeaconsByTransactionId(context.Context, int64) ([]AdBeacon, error)
 	}

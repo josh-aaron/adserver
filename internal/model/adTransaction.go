@@ -56,8 +56,8 @@ func (r *AdTransactionRepo) LogAdTransaction(ctx context.Context, transactionId 
 	}
 }
 
-func (r *AdTransactionRepo) LogBeacons(ctx context.Context, transactionId int64, beaconUri string, beaconName string) error {
-	log.Printf("adTransaction.LogBeacons() logging %v for transactionID: %v", beaconName, transactionId)
+func (r *AdTransactionRepo) LogBeacon(ctx context.Context, transactionId int64, beaconUri string, beaconName string) error {
+	log.Printf("adTransaction.LogBeacon() logging %v for transactionID: %v", beaconName, transactionId)
 	query := `
 	INSERT INTO ad_beacon (transaction_id, beacon_url, beacon_name)
 	VALUES ($1, $2, $3)

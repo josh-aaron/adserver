@@ -36,7 +36,7 @@ func (app *application) getCampaignByIdHandler(w http.ResponseWriter, r *http.Re
 	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "error: campaignId format invalid", http.StatusBadRequest)
 		return
 	}
 
@@ -44,7 +44,7 @@ func (app *application) getCampaignByIdHandler(w http.ResponseWriter, r *http.Re
 	campaign, err := app.repository.Campaign.GetById(ctx, campaignIdInt)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "error: campaignId not found", http.StatusNotFound)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (app *application) deleteCampaignHandler(w http.ResponseWriter, r *http.Req
 	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error: campaignId format invalid", http.StatusInternalServerError)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (app *application) deleteCampaignHandler(w http.ResponseWriter, r *http.Req
 	err = app.repository.Campaign.Delete(ctx, campaignIdInt)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error: error deleting campaignId", http.StatusInternalServerError)
 		return
 	}
 
@@ -84,7 +84,7 @@ func (app *application) createCampaignHandler(w http.ResponseWriter, r *http.Req
 	err := json.NewDecoder(r.Body).Decode(&newCampaign)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "error: error decoding request body", http.StatusBadRequest)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (app *application) createCampaignHandler(w http.ResponseWriter, r *http.Req
 	err = app.repository.Campaign.Create(ctx, campaign)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error: error creating campaign", http.StatusInternalServerError)
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -120,7 +120,7 @@ func (app *application) updateCampaignHandler(w http.ResponseWriter, r *http.Req
 	campaignIdInt, err := strconv.ParseInt(campaignIdParam, 10, 64)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error: campaignId format invalid", http.StatusInternalServerError)
 		return
 	}
 
@@ -128,7 +128,7 @@ func (app *application) updateCampaignHandler(w http.ResponseWriter, r *http.Req
 	err = json.NewDecoder(r.Body).Decode(&updatedCampaign)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, "error: error decoding request body", http.StatusBadRequest)
 		return
 	}
 
@@ -137,9 +137,9 @@ func (app *application) updateCampaignHandler(w http.ResponseWriter, r *http.Req
 	if err != nil {
 		switch err {
 		case model.ErrNotFound:
-			http.Error(w, err.Error(), http.StatusNotFound)
+			http.Error(w, "error: campaignId not found", http.StatusNotFound)
 		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, "error: error updating campaign", http.StatusInternalServerError)
 		}
 	}
 

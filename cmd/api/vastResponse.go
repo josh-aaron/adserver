@@ -18,7 +18,7 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	dmaIdInt, err := strconv.ParseInt(dmaIdParam, 10, 64)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error: dmaId format invalid", http.StatusInternalServerError)
 		return
 	}
 
@@ -29,7 +29,7 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	campaign, err := app.repository.Campaign.GetByDma(ctx, dmaIdInt)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusNotFound)
+		http.Error(w, "error: error retrieving campaign for dma", http.StatusNotFound)
 		return
 	}
 
@@ -40,7 +40,7 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	vast, vastDuration, err := app.repository.VastResponse.GetVast(ctx, campaign, currentDurationServed, transactionId)
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error: error retrieving vast response", http.StatusInternalServerError)
 	}
 
 	// Update the current ad duration served in our in-memory cache with the total duration in the latest vast response
@@ -50,7 +50,7 @@ func (app *application) getVastHandler(w http.ResponseWriter, r *http.Request) {
 	vastXml, err := xml.MarshalIndent(vast, "", "  ")
 	if err != nil {
 		log.Print(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "error: error construct vast xml", http.StatusInternalServerError)
 	}
 
 	w.Write(vastXml)
