@@ -68,7 +68,7 @@ function fireQuartileBeacons() {
 	const duration = videoElement.duration
 
 	const trackingEventFirstQuartile = trackingEvents["firstQuartile"]
-	const trackingEventMidpoint = trackingEvents["Midpoint"]
+	const trackingEventMidpoint = trackingEvents["midpoint"]
 	const trackingEventThirdQuartile = trackingEvents["thirdQuartile"]
 
 	if (!firstQuartileFired && currentTime >= duration * 0.25) {
