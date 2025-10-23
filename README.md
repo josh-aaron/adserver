@@ -15,7 +15,7 @@ Welcome to the README for the adserver project! Please also refer to the WORKLOG
 ## Project Setup & Verification Steps
 
 - Follow steps 1 - 6 below to build the app locally
-- Or, if you prefer to test on the cloud hosted app, please obtain the link that was email on Oct 20th, and skip to step 7.
+- Or, if you prefer to test on the cloud hosted app, please obtain the link that was emailed on Oct 20th, and skip to step 7.
 
 ### Core Requirements
 
@@ -417,7 +417,9 @@ Error:
 
 - Tech stack
    - Goal was to use as few external packages/dependencies as possible
-   - I chose Postgres instead of MySQL simply because I haven't worked with it before and wanted a new learning experience
+   - I chose Postgres instead of MySQL/SQLite simply because I haven't worked with it before and wanted a new learning experience
+      - Another interesting option would have been to use a NoSQL DB like Mongo - as many high throughput DBs used in the adtech space leverage NoSQL (e.g., Aerospike, Dynamo)
+   - Decided against using an ORM, but wanted to gain experience using database migrations, so started using golang-migrate (CLI Tool) for the initial set up of Campaign table
 - Architecture/project set up
    - Repository Pattern: Transport, Service, Repository Layers
        - The transport layer handles the API routing and project initialization logic. It is completely separate and independent from the business and database logic
@@ -428,10 +430,11 @@ Error:
 - API routing
    - To align with my goal of minimizing external dependencies, I chose to stick with the net/http package from the Go standard library, and implement any middleware manually (i.e., rateLimiter)
    - Another good option would have been to use Chi (https://go-chi.io/). Despite being an external package, it is extremely popular. If I had ended up implementing more middleware (e.g., authentication, structured logging) it may have made sense to implement to improve code clarity
+   - That said, it looks like there are some clever ways to implement relatively hassle-free middleware without any external packages using chaining (see https://www.alexedwards.net/blog/organize-your-go-middleware-without-dependencies)
 - Database tables
    - Here is where I must explain my most "controversial" decision: combining the ad and creative data with the campaign data into a single table
    - In a real world scenario, these would be segregated into different tables. However, given: a. the limited time frame of the project, and b. the need for  the requirements to be verified/tested in 10 - 20 minutes, I decided that it would be best to allow the tester to modify an ad/creative data using the Campaign API endpoints
-   - A better approach, given more time for implementation and testing, would have been to keep the ad and creative data in its own table and expose another set of API endpoints for the ad/creatives. Then, when it comes to query, use a foreign key to join the campaign and ad/creative tables
+   - A better approach, given more time for implementation and testing, would have been to keep the ad and creative data in its own table and expose another set of API endpoints for the ad/creatives. Then, when it  time to query, use a foreign key to join the campaign and ad/creative tables
 - Campaign API
    - Went with standard CRUD operation APIs, while ensuring that no business logic is contained in the transport layer (i.e., the api folder within the main package)
 - Ad Response API
@@ -445,11 +448,14 @@ Error:
        - Another option would have been to use a sliding window algorithm. While sliding windows are more accurate and less susceptible to bursts (e.g., a burst of 20 requests at minute 59, and an additional 20 requests at minute 61), this algorithm would have been more complex to implement
    - The requirement that the rate limiting be based on ad duration served instead of a count of requests to the server was a really interesting challenge. I also worked under the assumption that, at a future date, the vast response service would need to know the current ad duration served for a given user, and incorporate that in the ad selection logic so as to not exceed that limit
        - However, in this version of the adserver, the currentAdDurationServed is not used in the ad selection logic
-- Unit Testing
-    - I implemented a  WIP unit testing structure for the APIs. One of the benefits of using a repository pattern is the ability to mock data for testing purposes, which I took a stab at
+- Unit Testing & CI/CD
+    - I implemented a WIP unit testing structure for the APIs. One of the benefits of using a repository pattern with dependency injection is the ability to mock data for testing purposes, which I took a stab at
     - However, there are conflicting views from resources online that claim that it is in fact better to use a real database for testing
         - I think this actually makes more sense, as the interface methods implemented for the mock repo classes can more closely resemble the real methods, and test the SQL queries 
         - This approach, combined with having a separate, test DB in a docker container, I think would be better than mocking the data
+   - I also implemented a very basic CI/CD proof of concept:
+      - Every push to the main branch triggers a GH action to run the unit test(s). If the unit tests pass, the updates to the main branch will be built and deployed to the cloud. If not, the deploy will not occur
+      - See the Future Enhancements and Considerations section for details on a proposed CI/CD process that is more robust
 
 ## Implementation Decision Making Hierarchy
 1. Leverage past experience from similar projects
@@ -463,10 +469,12 @@ Leverage 2 & 3 to find more optimal approaches from 1
 ## Future Enhancements and Considerations
 
 ### Engineering/Dev Related
+- Depending on the expected scale / throughput of the production adserver, consider implementing event driven architecture, microservices, or some combination
 - Implement rate limiting using Redis cache instead of in-memory
    - Distributed cache allows for rate limiting for users across multiple server instances
 - Authentication & Authorization
    - Especially required for managing campaigns
+   - Could have used a basic API token for the purposes of this project
 - Database caching for frequently used creatives
    - Use Redis to cache creatives frequently selected for insertion in ad responses
 - Explore optimistic concurrency control/locks to avoid race conditions
@@ -477,6 +485,18 @@ Leverage 2 & 3 to find more optimal approaches from 1
 - Campaign Active vs. Inactive
    - Run chronjob daily to designate campaign as active/inactive based on date that chronjob is run
    - May optimize ad response process by reducing the number of steps/calculations required
+- Implement a more robust CI/CD pipeline for a production level app could look like the following:
+   - Divide production code base and development code base into two branches:
+      - "master" branch which is what ultimately gets deployed to the cloud 
+      - "dev" branch where all work for a given release is merged
+   - Feature development lifecycle:
+      1. Engineers will create a new feature branch off of dev, corresponding to a sprihnt ticket
+      2. Once work on that ticket is complete and ready for code review, engineers create a PR to merge the feature branch into dev
+      3. Unit tests will run on the branch from the PR. If they pass, then the branch can be merged into dev (assuming code review is complete)
+   - Create a suite of end-to-end tests that run on a frequent basis (e.g., daily, every 8 hours)
+   - When it comes time for a new version release, additional checks/tests are performed on the dev branch, which has all the new feautres merged to it for that version
+      - If those checks pass, then dev gets merged into master branch, and updated master branch gets deployed to the cloud
+      - Can also include a staging environment step
 
 ### Adtech Related
 - Expand ad request query parameters (e.g., slot parameters)

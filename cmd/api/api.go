@@ -32,6 +32,8 @@ type dbConfig struct {
 
 // TODO: update routes with API verison, e.g., /v1/campaigns, /v1/ads
 func (app *application) mount() http.Handler {
+	// It's good practice to create your own mux since http.Handle uses a default global mux, which all packages
+	// have access to
 	mux := http.NewServeMux()
 
 	// Provides the routing to the client video player
@@ -62,6 +64,7 @@ func (app *application) mount() http.Handler {
 
 func (app *application) run(handler http.Handler) error {
 
+	// create our own server so we can configure read/write/idle timeouts
 	server := &http.Server{
 		Addr:         app.config.addr,
 		Handler:      handler,

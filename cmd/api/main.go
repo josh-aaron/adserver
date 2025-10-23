@@ -17,6 +17,7 @@ func main() {
 
 	// Initialize config struct, with required configurations for the server, db, and rateLimiter
 	config := config{
+		// Had to change "ADDR" to "PORT" to be compatible with Render cloud hosting
 		addr: env.GetString("PORT", ":8080"),
 		// TODO: update all other config fields to be ENV variables, or constants
 		db: dbConfig{
@@ -31,7 +32,7 @@ func main() {
 		},
 	}
 
-	// Initialize the db,
+	// Initialize the db
 	db, err := db.New(config.db.addr, config.db.maxOpenConns, config.db.maxIdleConns, config.db.maxIdleTime)
 	if err != nil {
 		log.Print(err)
@@ -57,6 +58,6 @@ func main() {
 	// Initialize the multiplexer, aka API router
 	mux := app.mount()
 
-	// If there's an error running the app, let's shut it down
+	// If there's an error starting the server, let's shut it down
 	log.Fatal(app.run(mux))
 }

@@ -23,6 +23,7 @@ func New(addr string, maxOpenConns int, maxIdleConns int, maxIdleTime string) (*
 	db.SetConnMaxIdleTime(duration)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	// calling defer cancel will cancel the context and release resources when the New method returns
 	defer cancel()
 	err = db.PingContext(ctx)
 	if err != nil {

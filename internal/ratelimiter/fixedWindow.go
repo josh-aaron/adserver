@@ -44,7 +44,6 @@ func (rl *FixedWindowRateLimiter) Allow(ip string) (bool, time.Duration) {
 	return false, rl.window
 }
 
-// After an IP address is
 func (rl *FixedWindowRateLimiter) resetCount(ip string) {
 	log.Printf("FixedWindowRateLimiter.resetCount() for ip %v", ip)
 	time.Sleep(rl.window)

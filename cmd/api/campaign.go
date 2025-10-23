@@ -10,7 +10,7 @@ import (
 )
 
 // TODO: Implement helper methods to reduce repetitive code (e.g., header setting, error handling)
-// TODO: Implement validation for data sent by client.
+// TODO: Implement validation for data sent by client
 
 func (app *application) getCampaignsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("getCampaignsHandler()")
